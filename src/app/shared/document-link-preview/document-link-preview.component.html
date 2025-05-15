@@ -1,0 +1,5 @@
+<div *ngIf="isLinkExpired" class="center-screen">
+    <h2>{{'LINK_MSG_1' | translate}}</h2>
+    <h3>{{'LINK_MSG_2' | translate}}</h3>
+    <a class="btn btn-primary" [routerLink]="['/']">{{'GO_TO_HOME' | translate}}</a>
+</div>

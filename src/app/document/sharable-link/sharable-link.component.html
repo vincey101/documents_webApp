@@ -1,0 +1,94 @@
+<div class="d-flex">
+    <span mat-dialog-title class="dialog-title">{{ "SHAREABLE_LINK" | translate }}
+        <app-page-help-text [code]="'SHAREABLE_LINK'"></app-page-help-text>
+    </span>
+    <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+        <mat-icon class="close-icon" color="warn">close</mat-icon>
+    </button>
+</div>
+
+<div mat-dialog-content class="pt-0">
+    <form [formGroup]="documentLinkForm">
+        <div class="row">
+            <div *ngIf="isEditMode">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-md col">
+                        <label for="link" class="mb-0">{{'LINK_SHARING_IS_ON' | translate}}</label>
+                    </div>
+                    <div class="col-auto col-m-auto">
+                        <button (click)="deleteDocumentLink()" mat-icon-button class="mr-1 text-danger">
+                            <mat-icon class="text-danger">delete</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="openLinkSettings()" class="text-main">
+                            <mat-icon class="text-main">settings</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-12 input-group">
+                        <input formControlName="linkCode" type="text" id="link" class="form-control">
+                        <div matTooltip="Copy" [cdkCopyToClipboard]="documentLinkForm.get('linkCode').value"
+                            class="input-group-append" role="button">
+                            <span class="input-group-text bg-success">
+                                {{'COPY' | translate}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!isEditMode || isResetLink" class="card mb-0">
+                <div class="card-body">
+                    <section>
+                        <span>{{'LINK_EXPIRATION' | translate}}:</span>
+                        <p class="mb-0">
+                            <mat-checkbox color="primary" formControlName="isLinkExpiryTime">
+                                {{'IS_LINK_VALID_UNTIL' | translate}}:
+                            </mat-checkbox>
+                        </p>
+                        <ng-container *ngIf="documentLinkForm.get('isLinkExpiryTime').value">
+                            <div class="input-group">
+                                <input class="form-control" [owlDateTimeTrigger]="dt2" formControlName="linkExpiryTime"
+                                    [owlDateTime]="dt2" placeholder="Choose a date">
+                            </div>
+                            <owl-date-time #dt2></owl-date-time>
+                        </ng-container>
+                        <div class="text-danger"
+                            *ngIf="documentLinkForm.get('isLinkExpiryTime').touched && documentLinkForm.hasError('linkExpiryTimeValidator')">
+                            {{'DATE_IS_REQUIRED' | translate}}
+                        </div>
+                    </section>
+                    <hr>
+                    <section>
+                        <span>{{'PASSWORD_PROTECTION' | translate}}:</span>
+                        <p class="mb-0">
+                            <mat-checkbox color="primary" formControlName="isPassword">
+                                {{'IS_PASSWORD_REQUIRED' | translate}}:
+                            </mat-checkbox>
+                        </p>
+                        <input *ngIf="documentLinkForm.get('isPassword').value" autocomplete="new-password"
+                            type="password" class="form-control" formControlName="password">
+                        <div class="text-danger"
+                            *ngIf="documentLinkForm.get('isPassword').touched && documentLinkForm.hasError('passwordValidator')">
+                            {{'PASSWORD_IS_REQUIRED' | translate}}
+                        </div>
+                    </section>
+                    <hr>
+                    <section>
+                        <span>{{'ALLOW_DOWNLOAD' | translate}}</span>
+                        <p class="mb-0">
+                            <mat-checkbox formControlName="isAllowDownload" color="primary">
+                                {{'USERS_WITH_LINK_CAN_DOWNLOAD_THIS_ITEM' | translate}}
+                            </mat-checkbox>
+                        </p>
+                    </section>
+                </div>
+            </div>
+            <button type="submit" (click)="createLink()" *ngIf="!isEditMode" class="btn btn-success">
+                {{'CREATE_LINK' | translate}}
+            </button>
+            <button type="submit" (click)="createLink()" *ngIf="isEditMode && isResetLink" class="btn btn-success">
+                {{'UPDATE_LINK' | translate}}
+            </button>
+        </div>
+    </form>
+</div>

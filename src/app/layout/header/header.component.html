@@ -1,0 +1,137 @@
+<nav #navbar class="navbar active">
+  <div class="container-fluid">
+
+    <div class="navbar-header d-none d-md-flex" [ngClass]="isOpenSidebar ? 'sidebar-collapsed' : 'sidebar-open'">
+      <a onClick="return false;" class="navbar-toggle collapsed" style="order: 3;"
+        (click)="isNavbarCollapsed = !isNavbarCollapsed" aria-expanded="false"></a>
+      <!-- mobile menu bars -->
+      <a onClick="return false;" class="bars" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
+      <a class="navbar-brand" routerLink="/" *ngIf="!isOpenSidebar">
+        <img *ngIf="logoImage" [src]="logoImage" alt="Logo" class="logo-img" />
+         <img *ngIf="!logoImage" src="assets/images/logo.png" alt="logo" class="logo-lg">
+      </a>
+      <a class="navbar-brand" [ngStyle]="{
+        'margin-left': !isOpenSidebar ? '15px' : '0px'
+      }" routerLink="/" *ngIf="isOpenSidebar">
+        <img *ngIf="smallLogoImage" [src]="smallLogoImage" style="max-height: 40px;" alt="Logo" class="logo-img" />
+        <img *ngIf="!smallLogoImage" src="assets/images/logo-small.png" style="max-height: 40px;" alt="Logo" class="logo-img" />
+      </a>
+    </div>
+    <div class="navbar-header d-flex d-md-none">
+      <a onClick="return false;" class="navbar-toggle collapsed" style="order: 3;"
+        (click)="isNavbarCollapsed = !isNavbarCollapsed" aria-expanded="false"></a>
+      <!-- mobile menu bars -->
+      <a onClick="return false;" class="bars" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
+      <a class="navbar-brand" routerLink="/" *ngIf="!isOpenSidebar">
+        <img [src]="logoImage" alt="Logo" class="logo-img" />
+      </a>
+    </div>
+    <div class="collapse navbar-collapse" [ngClass]="isNavbarCollapsed ? '' : 'show'">
+      <ul class="pull-left collapse-menu-icon">
+        <li class="menuBtn">
+          <button mat-button (click)="callSidemenuCollapse()" class="sidemenu-collapse nav-notification-icons">
+            <i-feather name="menu" class="header-icon"></i-feather>
+          </button>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="nav-item">
+          <button mat-button [matMenuTriggerFor]="languagemenu"
+            class="lang-dropdown nav-notification-icons d-flex align-items-center">
+            <img src="{{defaultFlag}}" height="16">
+          </button>
+          <mat-menu #languagemenu="matMenu" class="lang-item-menu">
+            <div *ngFor="let item of languages" class="lang-item">
+              <button mat-menu-item class="dropdown-item lang-item-list" (click)="setNewLanguageRefresh(item)"
+                [ngClass]="{'active': item.active===true}">
+                <img src="{{item.imageUrl}}" class="flag-img" height="12"> <span
+                  class="align-middle">{{item.name}}</span>
+              </button>
+            </div>
+          </mat-menu>
+        </li>
+        <li class="nav-item" ngbDropdown [dir]="direction === 'rtl' ? 'ltr' : 'auto'">
+          <button mat-button [matMenuTriggerFor]="notificationMenu" class="nav-notification-icons">
+            <i-feather name="bell" class="header-icon"></i-feather>
+            <span *ngIf="isUnReadNotification" class="label-count bg-orange"></span>
+          </button>
+          <mat-menu #notificationMenu="matMenu" class="nfc-menu">
+            <div class="nfc-header">
+              <h5 class="mb-0">{{'NOTIFICATIONS' | translate}}</h5>
+              <a (click)="markAllAsReadNotification()" class="nfc-mark-as-read cursor-pointer">
+                {{'MARK_ALL_AS_READ' | translate}}
+              </a>
+            </div>
+            <div class="nfc-dropdown">
+              <ng-scrollbar style="height: 350px" visibility="hover">
+                <div class="noti-list header-menu">
+                  <div class="menu">
+                    <div>
+                      <button mat-menu-item *ngFor="let notification of notifications"
+                        (click)="viewNotification(notification)">
+                        <span class="table-img msg-user" *ngIf="notification.documentId">
+                          <i class="material-icons-two-tone nfc-type-icon nfc-green">description</i>
+                        </span>
+                        <span class="table-img msg-user" *ngIf="!notification.documentId">
+                          <i class="material-icons-two-tone nfc-type-icon nfc-green">event_available</i>
+                        </span>
+                        <span class="menu-info" [dir]="direction === 'rtl' ? 'rtl' : 'ltr'">
+                          <ng-container *ngIf="!notification.message && notification.documentId">
+                            <span class="menu-title ">
+                              <b> <small> {{notification.documentName | limitTo: '25'}}</small></b>
+                              <small> {{'DOCUMENT_PERMISSION_GRANTED_TO_YOU' | translate}}
+                              </small>
+                            </span>
+                          </ng-container>
+                          <ng-container *ngIf="notification.message">
+                            <small class="menu-title">{{notification.message}}
+                              <ng-container *ngIf="notification.documentId">
+                                ::{{notification.documentName | limitTo: '25'}}
+                              </ng-container>
+                            </small>
+                          </ng-container>
+                          <span class="menu-desc mt-1">
+                            <i class="material-icons">access_time</i>
+                            {{notification.createdDate | utcToLocalTime:'shortDate' }}
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </ng-scrollbar>
+            </div>
+            <div class="nfc-footer">
+              <a [routerLink]="['/notifications']" class="nfc-read-all">
+                {{'VIEW_ALL' | translate}}
+              </a>
+            </div>
+          </mat-menu>
+        </li>
+        <li class="nav-item user_profile">
+          <button mat-button [matMenuTriggerFor]="profilemenu">
+            <div class="chip dropdown-toggle" ngbDropdownToggle class="">
+              <img src="assets/images/user.jpg" class="rounded-circle" width="32" height="32" alt="User">
+            </div>
+          </button>
+          <mat-menu #profilemenu="matMenu" class="profile-menu">
+            <div class="noti-list">
+              <div class="menu ">
+                <div class="user_dw_menu">
+                  <button (click)="onProfileClick()" mat-menu-item>
+                    <i-feather name="user" class="user-menu-icons"></i-feather>
+                    {{appUserAuth?.user?.firstName}} {{appUserAuth?.user?.lastName}}
+                  </button>
+                  <button mat-menu-item (click)="logout()">
+                    <i-feather name="log-out" class="user-menu-icons"></i-feather>
+                    {{'LOGOUT' | translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-menu>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

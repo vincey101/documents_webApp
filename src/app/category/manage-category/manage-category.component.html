@@ -1,0 +1,38 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title">{{'MANAGE_DOCUMENT_CATEGORY' | translate}}
+    <app-page-help-text [code]="'DOCUMENT_CATEGORIES'"></app-page-help-text></span>
+</div>
+<mat-dialog-content>
+  <form [formGroup]="categoryForm" novalidate>
+    <div class="row">
+      <div class="col-sm-12">
+        <label class="form-label" for="categoryName">{{'NAME' | translate}}</label>
+        <input formControlName="name" type="text" class="form-control" id="categoryName">
+        <div *ngIf="categoryForm.get('name').hasError('required') && categoryForm.get('name').touched">
+          <div class="text-danger">
+            {{'CATEGORY_NAME_IS_REQUIRED' | translate}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <label class="form-label" for="description">{{'DESCRIPTION' | translate}}</label>
+        <textarea formControlName="description" name="description" type="text" class="form-control">
+            </textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 mt-3">
+        <button (click)="saveCategory()" type="submit" class="btn btn-success btn-sm m-r-10">
+          <i-feather name="save" class="small-icon"></i-feather>
+          {{'SAVE' | translate}}
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" (click)="onCancel()"> <i-feather name="x-circle"
+            class="small-icon"></i-feather>
+          {{'CANCEL' | translate}}
+        </button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>

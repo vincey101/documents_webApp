@@ -1,0 +1,134 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row align-items-center">
+          <div class="col">
+              <span class="page-title">{{ "DOCUMENT_CATEGORIES" | translate }}
+                <app-page-help-text code="DOCUMENT_CATEGORIES"></app-page-help-text>
+              </span>
+          </div>
+          <div class="col-auto">
+            <div class="flex">
+              <button class="btn btn-primary btn-sm me-2" (click)="refresh()">
+                  <i-feather name="refresh-cw" class="small-icon me-1"></i-feather>
+                  <span>{{ "REFRESH" | translate }}</span>
+                </button>
+                <button *hasClaim="'DOCUMENT_CATEGORY_MANAGE_DOCUMENT_CATEGORY'" (click)="manageCategory(null)"
+                  class="btn btn-success btn-sm">
+                  <i-feather name="Plus" class="btn-success small-icon"></i-feather>
+                  <span class="d-none d-sm-inline"> {{'ADD_DOCUMENT_CATEGORY' | translate}}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="body table-responsive">
+            <div class="grid-height-large">
+              <table mat-table [dataSource]="categoryStore.rootCategories()" multiTemplateDataRows class="w-100">
+                <ng-container matColumnDef="subcategory">
+                  <th style="width:10%" mat-header-cell *matHeaderCellDef> </th>
+                  <td style="width:10%" mat-cell *matCellDef="let element">
+                    <i-feather [name]="direction === 'rtl' ? 'chevrons-left' : 'chevrons-right'" class="cursor-pointer"
+                      *ngIf="element != expandedElement" (click)="toggleRow(element)"></i-feather>
+                    <i-feather class="cursor-pointer" name="chevrons-down" (click)="toggleRow(element)"
+                      *ngIf="element == expandedElement"></i-feather>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                  <th style="width:30%" mat-header-cell *matHeaderCellDef>{{'ACTION' | translate}} </th>
+                  <td style="width:30%" mat-cell *matCellDef="let element">
+                    <button *hasClaim="'DOCUMENT_CATEGORY_MANAGE_DOCUMENT_CATEGORY'" (click)="manageCategory(element)"
+                      class="btn btn-success btn-sm m-r-10" type="button">
+                      <i-feather name="edit" class="small-icon"></i-feather>
+                      <span class="d-none d-sm-inline"> {{'EDIT' | translate}}</span>
+                    </button>
+                    <button *hasClaim="'DOCUMENT_CATEGORY_MANAGE_DOCUMENT_CATEGORY'" (click)="deleteCategory(element)"
+                      class="btn btn-danger btn-sm" type="button">
+                      <i-feather name="trash" class="small-icon"></i-feather>
+                      <span class="d-none d-sm-inline"> {{'DELETE' | translate}}</span>
+                    </button>
+                  </td>
+                </ng-container>
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef> {{'NAME' | translate}} </th>
+                  <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                </ng-container>
+                <ng-container matColumnDef="expandedDetail">
+                  <td [ngClass]="{'border-none': categoryObject !== expandedElement }" mat-cell
+                    *matCellDef="let categoryObject" [attr.colspan]="columnsToDisplay.length">
+                    <div class="example-element-detail"
+                      [@detailExpand]="categoryObject == expandedElement ? 'expanded' : 'collapsed'">
+                      <div class="inner-table">
+                        <div class="row align-items-center">
+                          <!-- Left-hand side: Title -->
+                          <div class="col-md-6 mb-2">
+                            <h2 class="mb-0 page-title">{{'CHILD_CATEGORIES' |
+                              translate}}
+                            </h2>
+                          </div>
+                          <!-- Right-hand side: Buttons -->
+                          <div class="col-md-6 d-flex justify-content-end mb-2">
+                            <button *hasClaim="'DOCUMENT_CATEGORY_MANAGE_DOCUMENT_CATEGORY'"
+                              class="btn btn-success btn-sm me-2" (click)="addSubCategory(categoryObject)">
+                              <i-feather name="Plus" class="btn-success small-icon"></i-feather>
+                              {{'ADD_CHILD_CATEGORY' | translate}}
+                            </button>
+                          </div>
+                        </div>
+                        <div class="table-responsive">
+                          <table mat-table [dataSource]="categoryStore.childCategories()" multiTemplateDataRows>
+                            <ng-container matColumnDef="action">
+                              <th style="width:30%" mat-header-cell *matHeaderCellDef>{{'ACTION' |
+                                translate}}
+                              </th>
+                              <td style="width:30%" mat-cell *matCellDef="let element">
+                                <button *hasClaim="'DOCUMENT_CATEGORY_MANAGE_DOCUMENT_CATEGORY'"
+                                  (click)="manageCategory(element)" class="btn btn-success btn-sm me-2" type="button">
+                                  <i-feather name="edit" class="small-icon"></i-feather>
+                                  <span class="d-none d-sm-inline"> {{'EDIT' | translate}}</span>
+                                </button>
+                                <button *hasClaim="'DOCUMENT_CATEGORY_MANAGE_DOCUMENT_CATEGORY'"
+                                  (click)="deleteCategory(element)" class="btn btn-danger btn-sm" type="button">
+                                  <i-feather name="trash" class="small-icon"></i-feather>
+                                  <span class="d-none d-sm-inline"> {{'DELETE' | translate}} </span>
+                                </button>
+                              </td>
+                            </ng-container>
+                            <ng-container matColumnDef="name">
+                              <th mat-header-cell *matHeaderCellDef> {{'NAME' | translate}} </th>
+                              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                            </ng-container>
+                            <tr *matNoDataRow>
+                              <td colspan="8">
+                                <div class="m-2">
+                                  <b> {{'NO_DATA_FOUND' | translate}}</b>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr mat-header-row *matHeaderRowDef="subCategoryColumnToDisplay;sticky: true"></tr>
+                            <tr mat-row *matRowDef="let row; columns: subCategoryColumnToDisplay;"></tr>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="columnsToDisplay;sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

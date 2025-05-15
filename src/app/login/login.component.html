@@ -1,0 +1,65 @@
+<div class="container-fluid p-0" [dir]="direction">
+  <div class="row g-0">
+    <div class="col-lg-8">
+      <div class="auth-bg">
+        <div *ngIf="bannerImage" class="bg-overlay" style='background-image: url({{bannerImage}});'></div>
+        <div *ngIf="!bannerImage" class="bg-overlay" style='background-image: url("assets/images/login-image.png");'>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="auth-content p-4 d-flex align-items-center min-vh-100">
+        <div class="w-100">
+          <div class="row justify-content-center">
+            <div class="col-lg-9">
+              <div>
+                <div class="text-center">
+                  <div class="m-b-10">
+                    <a class="logo-full"><img *ngIf="logoImage" [src]="logoImage" alt="logo-full"></a>
+                    <a class="logo-full"><img *ngIf="!logoImage" src="assets/images/logo.png" alt="logo-full"></a>
+                  </div>
+                  <p class="text-muted"> {{'LOGIN_TO_CONTINUE' | translate}}</p>
+                </div>
+                <div class="p-2 mt-5">
+                  <form [formGroup]="loginFormGroup" (submit)="onLoginSubmit()">
+                    <div class="col-sm-12">
+                      <div class="mb-3">
+                        <label class="form-label">{{'EMAIL' | translate}}</label>
+                        <input formControlName="userName" class="form-control" type="text">
+                        <div class="text-danger"
+                          *ngIf="loginFormGroup.get('userName').touched && loginFormGroup.get('userName')?.hasError('required')">
+                          {{'EMAIL_IS_REQUIRED' | translate}}
+                        </div>
+                        <div class="text-danger"
+                          *ngIf="loginFormGroup.get('userName').touched && loginFormGroup.get('userName')?.hasError('email')">
+                          {{'PLEASE_ENTER_VALID_EMAIL' | translate}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12">
+                      <div class="mb-3">
+                        <label class="form-label">{{'PASSWORD' | translate}}</label>
+                        <input type="password" formControlName="password" class="form-control" type="password">
+                        <div class="text-danger"
+                          *ngIf="loginFormGroup.get('password').touched && loginFormGroup.get('password')?.hasError('required')">
+                          {{'PASSWORD_IS_REQUIRED' | translate}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 mb-3">
+                      <a class="forget-password-btn" [routerLink]="['/forgot-password']">{{'FORGOT_PASSWORD' |
+                        translate}}?</a>
+                      <button mat-flat-button color="primary" class="login100-form-btn btn-sm" type="submit">
+                        {{'LOGIN' | translate}}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

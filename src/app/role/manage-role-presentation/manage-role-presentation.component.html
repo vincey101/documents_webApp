@@ -1,0 +1,67 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row">
+          <div class="col-6">
+            <div class="mb-2">
+              <span  class="page-title">{{'MANAGE_ROLE' | translate}} <app-page-help-text code="MANAGE_ROLE"></app-page-help-text></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="body">
+            <div class="row margin-2">
+              <div class="col-md-6">
+                <label class="form-label">{{'ROLE_NAME' | translate}}</label>
+                <input [(ngModel)]="role.name" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="row margin-2">
+              <div class="col-sm-12">
+                <h4 class="widget-title">{{'PERMISSION' | translate}}</h4>
+                <mat-checkbox color="primary" (change)="selecetAll($event)">
+                  {{'SELECT_ALL' | translate}}
+                </mat-checkbox>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <div fxLayout="row wrap" *ngFor='let page of pages; let i=index'>
+                  <div fxFlex="100" fxFlex.sm="100">
+                    <mat-checkbox color="primary" (change)="onPageSelect($event,page)">
+                      <b> {{page.name.replaceAll(' ', '_').toUpperCase() | translate}}</b>
+                    </mat-checkbox>
+                  </div>
+                  <div class="row m-l-15">
+                      <div class="col-sm-3 row" *ngFor='let action of page.pageActions'>
+                        <mat-checkbox color="primary" [checked]="checkPermission(action.id)"
+                          (change)="onPermissionChange($any($event),page,action)">
+                          {{action.name.replaceAll(' ', '_').toUpperCase() | translate}}
+                        </mat-checkbox>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12 mt-2">
+                <button class="btn btn-success btn-sm m-r-10" (click)="saveRole()" cdkFocusInitial>
+                  <i-feather name="save" class="small-icon"></i-feather> {{'SAVE' | translate}}
+                </button>
+                <button class="btn btn-danger btn-sm" [routerLink]="['/roles']">
+                  <i-feather name="x-circle" class="small-icon"></i-feather> {{'CANCEL' | translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

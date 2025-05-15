@@ -1,0 +1,65 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <!-- Left-hand side: Title -->
+      <div class="col-md-6 mb-2">
+        <span *ngIf="!isEditMode" class="mb-0 page-title">{{'ADD_PROMPT_TEMPLATE' | translate}}
+          <app-page-help-text code="PROMPT_TEMPLATE"></app-page-help-text>
+        </span>
+        <span *ngIf="isEditMode" class="mb-0 page-title">{{"EDIT_PROMPT_TEMPLATE" | translate}}
+          <app-page-help-text code="PROMPT_TEMPLATE"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <form [formGroup]="aiPromtTemplateForm">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group ">
+                <label class="text-danger"> {{'NAME' | translate }} *</label>
+                <input formControlName="name" class="form-control form-control-sm" type="text">
+                <div *ngIf="aiPromtTemplateForm.get('name').dirty && aiPromtTemplateForm.get('name').errors">
+                  <div class="text-danger" *ngIf="aiPromtTemplateForm.get('name').errors?.['required']">
+                    {{'NAME_IS_REQUIRED' | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group ">
+                <label>{{'DESCRIPTION' | translate }} </label>
+                <input formControlName="description" class="form-control form-control-sm" type="text">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group ">
+                <label class="text-danger">
+                  {{'PROMPT_INPUT' | translate }} *
+                  <span class="text-danger">
+                    {{'WORD_MUST_BE_START_AND_END_WITH' | translate }}
+                  </span>
+                </label>
+                <textarea formControlName="promptInput" class="form-control form-control-sm"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="mt-2 col-md-12">
+              <button class="btn btn-success btn-sm me-2" (click)="addUpdateAiPromptTemplate()" cdkFocusInitial>
+                <i-feather name="save" class="small-icon"></i-feather> {{ "SAVE" | translate }}
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/ai-template']">
+                <i-feather name="x-circle" class="small-icon"></i-feather> {{ "CANCEL" | translate }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

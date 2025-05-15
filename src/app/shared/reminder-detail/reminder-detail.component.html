@@ -1,0 +1,173 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title">{{ "REMINDER_DETAIL" | translate }}
+  </span>
+  <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+
+<div mat-dialog-content>
+  <div class="row">
+    <div class="col-sm-12">
+      <form [formGroup]="reminderForm">
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="subject"> {{'SUBJECT' | translate}}</label>
+            <input formControlName="subject" type="text" class="form-control" id="subject">
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="message"> {{'MESSAGE' | translate}}</label>
+            <textarea class="form-control" formControlName="message" id="message" cols="30"></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <mat-checkbox color="primary" (change)="checkData($event)" formControlName="isRepeated">
+              {{'REPEATE_REMINDER' | translate}}
+            </mat-checkbox>
+          </div>
+          <div class="col-md-2">
+            <mat-checkbox color="primary" formControlName="isEmailNotification">{{'SEND_EMAIL' |
+              translate}}</mat-checkbox>
+          </div>
+          <div class="col-md-4">
+          </div>
+        </div>
+        <div class="row" *ngIf="reminderForm.get('isRepeated').value">
+          <div class="form-group col-md-6">
+            <label for="frequency"> {{'FREQUENCY' | translate}}</label>
+            <select class="form-control" (change)="onFrequencyChange()" formControlName="frequency" id="frequency">
+              <option value="">--{{'NONE' | translate}}--</option>
+              <option [value]="frequencyItem?.id" *ngFor="let frequencyItem of reminderFrequencies">
+                {{frequencyItem?.name.toUpperCase() | translate}}
+              </option>
+            </select>
+            <div *ngIf="reminderForm.get('frequency').errors?.['required']">
+              <div class="text-danger">
+                {{'FREQUENCY_IS_REQUIRED' | translate}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="reminderForm.get('isRepeated').value">
+          <div class="col-md-12">
+            <div class="form-group" *ngIf="reminderForm.get('frequency').value == '0'">
+              <label for="weekDays">{{'WEEK_DAYS' | translate}}</label>
+              <div id="weekDays" class="row">
+                <div class="col-sm-auto mr-1" formArrayName="dailyReminders"
+                  *ngFor="let dailyReminder of dailyRemindersArray.controls; let i=index">
+                  <ng-container [formGroupName]="i">
+                    <mat-checkbox color="primary" class="mr-1" formControlName="isActive">
+                      {{dailyReminder.get('name').value.toUpperCase() | translate}}
+                    </mat-checkbox>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" *ngIf="reminderForm.get('frequency').value == '1'">
+              <label for="weekDay">{{'WEEK_DAYS' | translate}}</label>
+              <div id="weekDay">
+                <mat-radio-group formControlName="dayOfWeek">
+                  <mat-radio-button class="mr-2" color="primary" [value]="day.id"
+                    *ngFor="let day of dayOfWeek; let i=index">{{day.name | translate}}</mat-radio-button>
+                </mat-radio-group>
+              </div>
+            </div>
+            <div class="form-group" *ngIf="reminderForm.get('frequency').value == '3'">
+              <label for="Quarterly">{{'SELECT_QUARTER_DATE' | translate}}</label>
+              <div id="Quarterly" class="row">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>{{'MONTH' | translate}}</th>
+                      <th>{{'DAY' | translate}}</th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="quarterlyReminders">
+                    <tr *ngFor="let quarterlyReminder of quarterlyRemindersArray.controls; let i=index">
+                      <ng-container [formGroupName]="i">
+                        <td>{{quarterlyReminder.get('name').value.toUpperCase()| translate}}</td>
+                        <td>
+                          <select class="form-control" formControlName="month">
+                            <option [value]="mon.id" *ngFor="let mon of quarterlyReminder.get('monthValues').value">
+                              {{mon.name.toUpperCase() | translate}}
+                            </option>
+                          </select>
+                        </td>
+                        <td>
+                          <select class="form-control" formControlName="day">
+                            <option [value]="day" *ngFor="let day of days">
+                              {{day}}
+                            </option>
+                          </select>
+                        </td>
+                      </ng-container>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="form-group" *ngIf="reminderForm.get('frequency').value == '4'">
+              <label for="HalfYearly">{{'SELECT_DATE' | translate}}</label>
+              <div id="HalfYearly" class="row">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>{{'MONTH' | translate}}</th>
+                      <th>{{'DAY' | translate}}</th>
+                    </tr>
+                  </thead>
+                  <tbody formArrayName="halfYearlyReminders">
+                    <tr *ngFor="let halfYearlyReminder of halfYearlyRemindersArray.controls; let i=index">
+                      <ng-container [formGroupName]="i">
+                        <td>{{halfYearlyReminder.get('name').value | translate}}</td>
+                        <td>
+                          <select class="form-control" formControlName="month">
+                            <option [value]="mon.id" *ngFor="let mon of halfYearlyReminder.get('monthValues').value">
+                              {{mon.name | translate}}
+                            </option>
+                          </select>
+                        </td>
+                        <td>
+                          <select class="form-control" formControlName="day">
+                            <option [value]="day" *ngFor="let day of days">
+                              {{day}}
+                            </option>
+                          </select>
+                        </td>
+                      </ng-container>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-6" *ngIf="!reminderForm.get('isRepeated').value">
+            <label> {{'REMINDER_DATE' | translate}}</label>
+            <input class="form-control" [owlDateTimeTrigger]="dt2" [min]="minDate" formControlName="startDate"
+              [owlDateTime]="dt2" placeholder="{{'DATE' | translate}}">
+            <owl-date-time #dt2></owl-date-time>
+          </div>
+          <div class="form-group col-md-6" *ngIf="reminderForm.get('isRepeated').value">
+            <label> {{'REMINDER_START_DATE' | translate}}</label>
+            <input class="form-control" [owlDateTimeTrigger]="dt3" [min]="minDate" formControlName="startDate"
+              [owlDateTime]="dt3" placeholder="{{'START_DATE' | translate }}">
+            <owl-date-time #dt3></owl-date-time>
+          </div>
+          <div class="form-group col-md-6" *ngIf="reminderForm.get('isRepeated').value">
+            <label>{{'REMINDER_END_DATE' | translate}}</label>
+            <input class="form-control" [owlDateTimeTrigger]="dt4" formControlName="endDate" [owlDateTime]="dt4"
+              placeholder="{{'END_DATE' | translate }}">
+            <owl-date-time #dt4></owl-date-time>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

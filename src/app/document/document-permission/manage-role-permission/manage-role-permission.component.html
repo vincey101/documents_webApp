@@ -1,0 +1,63 @@
+<div class="d-flex">
+  <span mat-dialog-title class="page-title">{{ "ROLE_PERMISSION" | translate }}
+  </span>
+  <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<div mat-dialog-content [formGroup]="permissionForm">
+  <div class="row">
+    <div class=" col-md-12">
+      <label>{{'ROLES' | translate}}</label>
+      <ng-select [multiple]="true" formControlName="selectedRoles">
+        <ng-option *ngFor="let role of data.roles" [value]="role">{{role.name}}</ng-option>
+      </ng-select>
+    </div>
+  </div>
+  <div class="col-md-12 row">
+    <mat-checkbox (change)="timeBoundChange($event)" color="primary" formControlName="isTimeBound">
+      {{'SPACIFY_THE_PERIOD' | translate}}</mat-checkbox>
+  </div>
+  <div class="row" *ngIf="permissionForm.get('isTimeBound').value">
+    <div class="col-md-6">
+      <input [min]="minDate" class="form-control" placeholder="{{'CHOOSE_A_START_DATE' | translate}}"
+        formControlName="startDate" [owlDateTimeTrigger]="date1" [owlDateTime]="date1">
+      <owl-date-time #date1></owl-date-time>
+      <div class="row">
+        <div class="col-md-12 m-t-10 m-b-10">
+          <mat-error
+            *ngIf="permissionForm.get('startDate').touched && permissionForm.get('startDate').hasError('required')">
+            {{'START_DATE_IS_REQURED' | translate}}
+          </mat-error>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <input [min]="permissionForm.get('startDate').value" class="form-control"
+        placeholder="{{'CHOOSE_A_END_DATE' | translate}}" formControlName="endDate" [owlDateTimeTrigger]="date2"
+        [owlDateTime]="date2">
+      <owl-date-time #date2></owl-date-time>
+      <div class="row">
+        <div class="col-md-12 m-t-10 m-b-10">
+          <mat-error
+            *ngIf="permissionForm.get('startDate').touched && permissionForm.get('endDate').hasError('required')">
+            {{'END_DATE_IS_REQURED' | translate}}
+          </mat-error>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12 row">
+    <mat-checkbox color="primary" formControlName="isAllowDownload">{{'ALLOW_DOWNLOAD' | translate}}</mat-checkbox>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button class="btn btn-success btn-sm m-r-10" (click)="saveDocumentRolePermission()" cdkFocusInitial>
+    <i-feather name="save" class="small-icon"></i-feather>
+    {{'SAVE' | translate}}
+  </button>
+  <button class="btn btn-danger btn-sm" (click)="onNoClick()">
+    <i-feather name="x-circle" class="small-icon"></i-feather>
+    {{'CANCEL' | translate}}
+  </button>
+</div>

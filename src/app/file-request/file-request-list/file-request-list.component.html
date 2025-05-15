@@ -1,0 +1,167 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col mb-2">
+        <span class="mb-0 page-title">
+          {{ "FILE_REQUEST" | translate }}
+          <app-page-help-text code="MANAGE_FILE_REQUEST"></app-page-help-text>
+        </span>
+      </div>
+      <div class="col-auto d-flex justify-content-end mb-2">
+        <button *hasClaim="'FILE_REQUEST_CREATE_FILE_REQUEST'" [routerLink]="['/file-request/manage']"
+          class="btn btn-success btn-sm me-2">
+          <i-feather name="plus" class="small-icon"></i-feather>
+          {{ "ADD_FILE_REQUEST" | translate }}
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="header">
+        <div class="m-2 col-sm-5">
+          <input class="form-control" placeholder="{{'SEARCH_BY_SUBJECT' | translate}}" #input>
+        </div>
+      </div>
+      <div class="body">
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table mat-table [dataSource]="dataSource" matSort matSortActive="createdDate" matSortDirection="desc"
+              multiTemplateDataRows>
+              <ng-container matColumnDef="action">
+                <th class="table-column-fix-200" mat-header-cell *matHeaderCellDef>
+                  {{ "ACTION" | translate }}
+                </th>
+                <td class="table-column-fix-200" mat-cell *matCellDef="let fileRequestInfo">
+                  <div class="d-flex align-items-center">
+                    <button class="me-3" mat-icon-button (click)="toggleRow(fileRequestInfo)">
+                      <mat-icon *ngIf="fileRequestInfo != expandedElement">chevron_right</mat-icon>
+                      <mat-icon *ngIf="fileRequestInfo == expandedElement">expand_more</mat-icon>
+                    </button>
+                    <button *hasClaim="'FILE_REQUEST_UPDATE_FILE_REQUEST'" [routerLink]="['/file-request/manage', fileRequestInfo.id]"
+                      class="btn btn-success btn-sm me-2">
+                      <i-feather name="edit" class="small-icon"></i-feather>
+                      <span class="d-none d-sm-inline"></span>
+                    </button>
+                    <button *hasClaim="'FILE_REQUEST_DELETE_FILE_REQUEST'" (click)="deleteFileRequest(fileRequestInfo)" class="btn btn-danger btn-sm me-2"
+                      type="button">
+                      <i-feather name="trash" class="small-icon"></i-feather>
+                      <span class="d-none d-sm-inline"></span>
+                    </button>
+                    <div matTooltip="Copy" class="input-group-append" role="button">
+                      <button (click)="copyToClipboard(fileRequestInfo.id)" type="button"
+                        class="btn btn-primary btn-sm">
+                        <i-feather name="copy" class="small-icon"></i-feather>
+                        <span class="d-none d-sm-inline"></span>
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let fileRequestInfo" [attr.colspan]="displayedColumns.length">
+                  <ng-container *ngIf="fileRequestInfo == expandedElement">
+                    <div class="example-element-detail"
+                      [@detailExpand]="fileRequestInfo == expandedElement ? 'expanded' : 'collapsed'">
+                      <div class="inner-table mat-elevation-z8">
+                        <app-file-request-document-list
+                          [fileRequestInfo]="fileRequestInfo"></app-file-request-document-list>
+                      </div>
+                    </div>
+                  </ng-container>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="subject">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "SUBJECT" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo">
+                  {{ fileRequestInfo.subject }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "EMAIL" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo">
+                  {{ fileRequestInfo.email }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="sizeInMb">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "MAXIMUM_FILE_SIZE_UPLOAD" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo" [appFileSizeLabel]="fileRequestInfo.sizeInMb"></td>
+              </ng-container>
+              <ng-container matColumnDef="maxDocument">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "MAXIMUM_DOCUMENT_UPLOAD" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo">
+                  {{ fileRequestInfo.maxDocument }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="fileExtension">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "ALLOW_FILE_EXTENSION" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo">
+                  {{ fileRequestInfo.allowExtension }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "STATUS" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo"
+                  [appStatusColor]="fileRequestInfo.fileRequestStatus | fileRequestStatus">
+                  {{ fileRequestInfo.fileRequestStatus | fileRequestStatus | translate }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="createdBy">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "CREATED_BY" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo">
+                  {{ fileRequestInfo.createdByName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="createdDate">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "CREATED_DATE" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo">
+                  {{ fileRequestInfo.createdDate | utcToLocalTime : "full" }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="linkExpiryTime">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "LINK_EXPIRATION" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let fileRequestInfo">
+                  {{ fileRequestInfo.linkExpiryTime | utcToLocalTime : "full" }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="11" *matFooterCellDef>
+                  <mat-paginator [length]="fileRequestResource.totalCount" [pageSize]="fileRequestResource.pageSize"
+                    [pageSizeOptions]="[10, 20, 30]"></mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="11">
+                  <div class="m-2">
+                    <b> {{ "NO_DATA_FOUND" | translate }}</b>
+                  </div>
+                </td>
+              </tr>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [class.bg-warning1]="row.status === 1"></tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail'];" class="example-detail-row"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

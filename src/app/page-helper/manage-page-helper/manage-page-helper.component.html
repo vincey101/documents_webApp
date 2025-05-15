@@ -1,0 +1,64 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <!-- Left-hand side: Title -->
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">
+          {{ "EDIT_PAGE_HELPER" | translate }}
+          <app-page-help-text code="PAGE_HELPERS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <form [formGroup]="pageHelperForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ "NAME" | translate }}</label>
+                <input formControlName="name" class="form-control" type="text" />
+                <div *ngIf="
+                    pageHelperForm.get('name').touched &&
+                    pageHelperForm.get('name').errors
+                  ">
+                  <div class="text-danger" *ngIf="pageHelperForm.get('name')?.hasError('required')">
+                    {{ "NAME_IS_REQUIRED" | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="font-weight-bold">
+                  {{ "DESCRIPTION" | translate }}
+                </label>
+                <div class="NgxEditor__Wrapper">
+                  <ckeditor [editor]="editor" [config]="config" formControlName="description"></ckeditor>
+                </div>
+                <div *ngIf="
+                    pageHelperForm.get('description').touched &&
+                    pageHelperForm.get('description').errors
+                  ">
+                  <div class="text-danger" *ngIf="pageHelperForm.get('description')?.hasError('required')">
+                    {{ "DESCRIPTION_IS_REQUIRED" | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="m-top-10 col-md-12">
+                <button class="btn btn-success btn-sm me-2" (click)="update()" cdkFocusInitial>
+                  <i-feather name="save" class="small-icon"></i-feather> {{'SAVE' | translate}}
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/page-helper']">
+                  <i-feather name="x-circle" class="small-icon"></i-feather> {{'CANCEL' | translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,169 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span *ngIf="!isEditMode" class="mb-0 page-title">
+          {{ "ADD_FILE_REQUEST" | translate }}
+          <app-page-help-text code="MANAGE_FILE_REQUEST"></app-page-help-text>
+        </span>
+        <span *ngIf="isEditMode" class="mb-0 page-title">
+          {{ "EDIT_FILE_REQUEST" | translate }}
+          <app-page-help-text code="MANAGE_FILE_REQUEST"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <form [formGroup]="fileRequestForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label> {{ "SUBJECT" | translate }}</label>
+                <input formControlName="subject" class="form-control" type="text" />
+                <div *ngIf="
+                    fileRequestForm.get('subject').touched &&
+                    fileRequestForm.get('subject').errors
+                  ">
+                  <div class="text-danger" *ngIf="fileRequestForm.get('subject').errors?.['required']">
+                    {{ "SUBJECT_IS_REQUIRED" | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>{{ "EMAIL" | translate }}</label>
+                <input formControlName="email" class="form-control" type="email" />
+                <div *ngIf="fileRequestForm.get('email').touched && fileRequestForm.get('email').errors">
+                  <div class="text-danger" *ngIf="fileRequestForm.get('email').errors?.['email']">
+                    {{'PLEASE_ENTER_VALID_EMAIL' | translate}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>{{ "ALLOW_FILE_EXTENSION" | translate }}</label>
+                <mat-select panelClass="mat-select-control" placeholder="{{ 'SELECT_FILE_EXTENSION' | translate }}"
+                  class="form-control" formControlName="fileType" multiple>
+                  <mat-option *ngFor="let fileType of fileTypes" [value]="fileType.value">
+                    {{ fileType.key | translate }}
+                  </mat-option>
+                </mat-select>
+                <div *ngIf="
+                    fileRequestForm.get('fileType').touched &&
+                    fileRequestForm.get('fileType').errors
+                  ">
+                  <div class="text-danger" *ngIf="fileRequestForm.get('fileType').errors?.['required']">
+                    {{ "ALLOW_FILE_EXTENSION_IS_REQUIRED" | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>{{ "MAXIMUM_DOCUMENT_UPLOAD" | translate }}</label>
+                <input formControlName="maxDocument" class="form-control" type="number" min="1" />
+                <div *ngIf="
+                    fileRequestForm.get('maxDocument').touched &&
+                    fileRequestForm.get('maxDocument').errors
+                  ">
+                  <div class="text-danger" *ngIf="fileRequestForm.get('maxDocument').errors?.['required']">
+                    {{ "MAXIMUM_DOCUMENT_UPLOAD_IS_REQUIRED" | translate }}
+                  </div>
+                  <div class="text-danger" *ngIf="fileRequestForm.get('maxDocument').errors?.['min']">
+                    {{ "MAXIMUM_DOCUMENT_UPLOAD_MIN_VALUE" | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>{{ "MAXIMUM_FILE_SIZE_UPLOAD" | translate }}</label>
+                <mat-select panelClass="mat-select-control" placeholder="{{ 'SELECT_MAX_FILE_SIZE' | translate }}"
+                  formControlName="sizeInMb" class="form-control">
+                  <mat-option *ngFor="let size of fileSizeOptions" [value]="size.value">
+                    <span [appFileSizeLabel]="size.value"></span>
+                  </mat-option>
+                </mat-select>
+                <div *ngIf="
+                    fileRequestForm.get('sizeInMb').touched &&
+                    fileRequestForm.get('sizeInMb').errors
+                  ">
+                  <div class="text-danger" *ngIf="fileRequestForm.get('sizeInMb').errors?.['required']">
+                    {{ "FILE_SIZE_IS_REQUIRED" | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label> {{ "PASSWORD_PROTECTION" | translate }}</label>
+                <p>
+                  <mat-checkbox color="primary" formControlName="hasPassword">
+                    {{ "IS_PASSWORD_REQUIRED" | translate }}
+                  </mat-checkbox>
+                </p>
+                <div class="input-group">
+                  <input *ngIf="fileRequestForm.get('hasPassword').value" [type]="passwordFieldType"
+                    autocomplete="new-password" class="form-control" formControlName="password"
+                    placeholder="{{'ENTER_PASSWORD' | translate }}" />
+                  <div class="input-group-append">
+                    <button *ngIf="fileRequestForm.get('hasPassword').value" type="button"
+                      class="btn btn-primary calendar-button" (click)="togglePasswordVisibility()">
+                      <i-feather [name]="
+                          passwordFieldType === 'password' ? 'eye' : 'eye-off'
+                        " class="small-icon"></i-feather>
+                    </button>
+                  </div>
+                </div>
+                <div class="text-danger" *ngIf="
+                    fileRequestForm.get('hasPassword').touched &&
+                    fileRequestForm.hasError('passwordValidator')
+                  ">
+                  {{ "PASSWORD_IS_REQUIRED" | translate }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>{{ "LINK_EXPIRATION" | translate }}</label>
+                <p>
+                  <mat-checkbox color="primary" formControlName="isLinkExpiryTime">
+                    {{ "IS_LINK_VALID_UNTIL" | translate }}
+                  </mat-checkbox>
+                </p>
+                <div *ngIf="fileRequestForm.get('isLinkExpiryTime').value">
+                  <!-- Date picker input -->
+                  <div class="col-md-6">
+                    <input class="form-control" placeholder="{{ 'CHOOSE_A_START_DATE' | translate }}"
+                      formControlName="linkExpiryTime" [owlDateTimeTrigger]="date1" [owlDateTime]="date1" />
+                    <owl-date-time #date1></owl-date-time>
+                    <mat-error class="text-danger" *ngIf="
+                        fileRequestForm.get('linkExpiryTime').touched &&
+                        fileRequestForm
+                          .get('linkExpiryTime')
+                          .hasError('required')
+                      ">
+                      {{ "EXPIRY_DATE_IS_REQURED" | translate }}
+                    </mat-error>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="m-top-10 col-md-12">
+            <button class="btn btn-success btn-sm me-2" (click)="saveFileRequest()" cdkFocusInitial>
+              <i-feather name="save" class="small-icon"></i-feather>
+              {{ "SAVE" | translate }}
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/file-request']">
+              <i-feather name="x-circle" class="small-icon"></i-feather>
+              {{ "CANCEL" | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

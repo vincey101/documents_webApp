@@ -1,0 +1,118 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row">
+          <div class="col-6">
+            <div class="mb-2">
+              <span class="page-title">{{ "DOCUMENTS_AUDIT_TRAIL" | translate }}
+                <app-page-help-text code="DOCUMENTS_AUDIT_TRAIL"></app-page-help-text>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="body">
+            <div class="row margin-2">
+              <div class="col-md-3">
+                <input class="form-control" placeholder="{{'SEARCH_DOCUMENT_BY_NAME' | translate}}" #input>
+              </div>
+              <div class="col-md-3">
+                <ng-select placeholder="{{'CATEGORY' | translate}}" (change)="onCategoryChange($event)">
+                  <ng-option *ngFor="let category of categoryStore.categories()" [value]="category.id">
+                    <div class="country-item"
+                      [ngStyle]="this.direction === 'rtl'? {'margin-right.px': category.deafLevel* 20} : {'margin-left.px': category.deafLevel* 20}">
+                      <div *ngIf="!category.parentId">
+                        <b> {{category.name}}</b>
+                      </div>
+                      <div *ngIf="category.parentId">
+                        {{category.name}}
+                      </div>
+                    </div>
+                  </ng-option>
+                </ng-select>
+              </div>
+              <div class="col-md-3">
+                <ng-select (change)="onOperationChange($event)" placeholder="{{'SELECT_OPERATION' | translate}}">
+                  <ng-option *ngFor="let operation of documentOperations" [value]="operation">
+                    {{ operation.toUpperCase()| translate }}
+                  </ng-option>
+                </ng-select>
+              </div>
+              <div class="col-md-3">
+                <ng-select (change)="onUserChange($event)" placeholder="{{'SELECT_USER' | translate}}">
+                  <ng-option *ngFor="let user of users" [value]="user.id">
+                    {{user.firstName}} {{user.lastName}}
+                  </ng-option>
+                </ng-select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="table-responsive">
+                  <div class="grid-height-medium">
+                    <table mat-table [dataSource]="dataSource" class="w-100" matSort matSortActive="createdDate"
+                      matSortDirection="desc" matSortDisableClear>
+                      <ng-container matColumnDef="documentName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'NAME' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document.documentName}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="categoryName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'CATEGORY_NAME' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document.categoryName}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="createdDate">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'ACTION' | translate}} {{'DATE' |
+                          translate}}</th>
+                        <td mat-cell *matCellDef="let document"> {{document?.createdDate | utcToLocalTime:'short'}}
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="operationName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'OPERATION' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document.operationName.toUpperCase() | translate }}
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="createdBy">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'BY_WHOM' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document?.createdBy}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="permissionUser">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'TO_WHOM_USER' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document?.permissionUser}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="permissionRole">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'TO_WHOM_ROLE' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document?.permissionRole}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="footer">
+                        <td mat-footer-cell colspan="7" *matFooterCellDef>
+                          <mat-paginator [length]="documentResource.totalCount" [pageSize]="documentResource.pageSize"
+                            [pageSizeOptions]="[10, 20, 30]">
+                          </mat-paginator>
+                        </td>
+                      </ng-container>
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                      <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky: true"></tr>
+                      <tr *matNoDataRow>
+                        <td colspan="7">
+                          <div class="m-2">
+                            <b> {{'NO_DATA_FOUND' | translate}}</b>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

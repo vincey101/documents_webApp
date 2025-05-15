@@ -1,0 +1,62 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 col mb-2">
+        <span class="mb-0 page-title">{{'AI_DOCUMENT_GENERATOR' | translate}}</span>
+        <app-page-help-text [code]="'AI_DOCUMENT_GENERATOR'"></app-page-help-text>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <div class="row">
+          <div class="col-md-5">
+            <app-ai-document-generator-form
+              (generateHandler)="generateAiDocument($event)"></app-ai-document-generator-form>
+          </div>
+          <div class="col-md-7">
+            <form [formGroup]="aiEditorForm">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label class="font-weight-bold">
+                      {{ "DOCUMENT_SUMMARY" | translate }}
+                    </label>
+                    <div class="NgxEditor__Wrapper">
+                      <ckeditor [editor]="editor" (ready)="onReady($event)" formControlName="editorData"></ckeditor>
+                    </div>
+                    <div *ngIf="aiEditorForm.get('editorData').touched && aiEditorForm.get('editorData').errors">
+                      <div class="text-danger" *ngIf="aiEditorForm.get('editorData').hasError('required')">
+                        {{ "DESCRIPTION_IS_REQUIRED" | translate }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="m-top-10 col-md-12">
+                  <button type="button" class="btn btn-primary btn-sm" (click)="saveDocument()">
+                    {{ "SAVE_AS_PDF" | translate }}
+                  </button>
+                </div>
+              </div>
+              <div style="position:absolute;left:-15420px;">
+                <div style="width:100%;display:flex;">
+                  <div id="pdfDocument">
+                    <div class="container" style="width:95%;margin-right:auto;margin-left:auto;">
+                      <div innerHTML="{{aiEditorForm.get('editorData').value }}"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="spinner-container" *ngIf="isLoading">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</section>

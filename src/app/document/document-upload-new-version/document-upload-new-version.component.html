@@ -1,0 +1,68 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title"
+    >{{ "UPLOAD_NEW_VERSION_FILE" | translate }}
+    <app-page-help-text code="UPLOAD_NEW_VERSION"></app-page-help-text>
+  </span>
+  <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+
+<div mat-dialog-content>
+  <form [formGroup]="documentForm">
+    <div class="col-md-12">
+      <label>{{ "DOCUMENT_UPLOAD" | translate }}</label>
+      <input
+        class="form-control"
+        #file
+        (change)="upload(file.files)"
+        type="file"
+      />
+      <div
+        class="text-danger"
+        *ngIf="documentForm.get('url').touched  && documentForm.get('url').errors?.['required']"
+      >
+        {{ "DOCUMENT_IS_REQUIRED" | translate }}
+      </div>
+      <div
+        *ngIf="
+          (documentForm.get('extension').touched ||
+            documentForm.get('extension').dirty) &&
+          documentForm.get('extension').errors &&  !documentForm.get('url').errors?.['required']
+        "
+      >
+        <div
+          class="text-danger"
+          *ngIf="documentForm.get('extension').errors?.['required']"
+        >
+          {{ "DOCUMENT_TYPE_IS_NOT_ALLOWED" | translate }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <mat-progress-bar
+        *ngIf="showProgress"
+        mode="determinate"
+        [value]="progress"
+      ></mat-progress-bar>
+    </div>
+    <div class="m-t-10 col-md-12 m-b-2">
+      <button
+        class="btn btn-success btn-sm m-r-10"
+        (click)="SaveDocument()"
+        cdkFocusInitial
+      >
+        <i-feather name="save" class="small-icon"></i-feather>
+        {{ "SAVE" | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger btn-sm"
+        (click)="closeDialog()"
+      >
+        <i-feather name="x-circle" class="small-icon"></i-feather>
+        {{ "CANCEL" | translate }}
+      </button>
+    </div>
+  </form>
+</div>

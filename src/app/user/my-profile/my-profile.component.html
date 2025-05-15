@@ -1,0 +1,72 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col mb-2">
+        <span class="mb-0 page-title">
+          {{ "PROFILE" | translate }}
+        </span>
+      </div>
+      <div class="col-auto d-flex justify-content-end mb-2">
+        <button (click)="changePassword()" class="btn btn-success btn-sm">
+          <i-feather name="key" class="btn-success small-icon"></i-feather>
+          {{'CHANGE_PASSWORD' | translate}}
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <form [formGroup]="userForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group ">
+                <label>{{'FIRST_NAME' | translate}}</label>
+                <input formControlName="firstName" class="form-control" type="text">
+                <div *ngIf="userForm.get('firstName').touched && userForm.get('firstName').errors">
+                  <div class="text-danger" *ngIf="userForm.get('firstName').errors?.['required']">
+                    {{'FIRST_NAME_IS_REQUIRED' | translate}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group ">
+                <label>{{'LAST_NAME' | translate}}</label>
+                <input formControlName="lastName" class="form-control" type="text">
+                <div *ngIf="userForm.get('lastName').touched && userForm.get('lastName').errors">
+                  <div class="text-danger" *ngIf="userForm.get('lastName').errors?.['required']">
+                    {{'LAST_NAME_IS_REQUIRED' | translate}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group ">
+                <label>{{'MOBILE_NUMBER' | translate}}</label>
+                <input formControlName="phoneNumber" class="form-control" type="text">
+                <div *ngIf="userForm.get('phoneNumber').touched && userForm.get('phoneNumber').errors">
+                  <div class="text-danger" *ngIf="userForm.get('phoneNumber').errors?.['required']">
+                    {{'MOBILE_IS_REQUIRED' | translate}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{'EMAIL' | translate}}</label>
+                <input formControlName="email" class="form-control" type="email">
+              </div>
+            </div>
+            <div class="m-t-10 col-md-12">
+              <button class="btn btn-success btn-sm m-r-10" (click)="updateProfile()" cdkFocusInitial>
+                <i-feather name="save" class="small-icon"></i-feather>
+                {{'SAVE' | translate}}</button>
+              <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/']">
+                <i-feather name="x-circle" class="small-icon"></i-feather>
+                {{'CANCEL' | translate}}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

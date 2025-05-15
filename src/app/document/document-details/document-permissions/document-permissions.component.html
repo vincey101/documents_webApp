@@ -1,0 +1,109 @@
+<div class="row">
+    <div class="col-md-6" *hasClaim="['ALL_DOCUMENTS_SHARE_DOCUMENT','ASSIGNED_DOCUMENTS_SHARE_DOCUMENT']">
+        <button (click)="addDocumentUserPermission()" class="btn btn-success btn-sm m-r-10 m-t-10" type="button">
+            <i-feather name="plus" class="small-icon"></i-feather>
+            {{'ASSIGN_SHARE_WITH_USERS' | translate}}
+        </button>
+        <button (click)="addDocumentRolePermission()" class="btn btn-success btn-sm m-r-10 m-t-10 ml-3" type="button">
+            <i-feather name="plus" class="small-icon"></i-feather>
+            {{'ASSIGN_SHARE_WITH_ROLES' | translate}}
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div class="grid-height-auto">
+        <table mat-table [dataSource]="permissionsDataSource" class="w-100">
+            <ng-container matColumnDef="action">
+                <th style="width:20%" mat-header-cell *matHeaderCellDef>{{'ACTION' | translate}}
+                </th>
+                <td style="width:20%" mat-cell *matCellDef="let userPermission">
+                    <div *hasClaim="['ALL_DOCUMENTS_SHARE_DOCUMENT','ASSIGNED_DOCUMENTS_SHARE_DOCUMENT']">
+                        <button *ngIf="userPermission.type === 'User'" class="btn btn-danger btn-sm" type="button"
+                            (click)="deleteDocumentUserPermission(userPermission)">
+                            <i-feather name="trash" class="small-icon"></i-feather>
+                            {{'DELETE' |translate}}</button>
+                        <button *ngIf="userPermission.type === 'Role'" class="btn btn-danger btn-sm" type="button"
+                            (click)="deleteDocumentRolePermission(userPermission)">
+                            <i-feather name="trash" class="small-icon"></i-feather>
+                            {{'DELETE' | translate}}</button>
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="isAllowDownload">
+                <th mat-header-cell *matHeaderCellDef>{{'ALLOW_DOWNLOAD' | translate}} </th>
+                <td mat-cell *matCellDef="let userPermission">
+                    <ng-container *ngIf="userPermission.isAllowDownload">
+                        {{'YES' | translate}}
+                    </ng-container>
+                    <ng-container *ngIf="!userPermission.isAllowDownload">
+                        {{'NO' | translate}}
+                    </ng-container>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>{{'TYPE' | translate}} </th>
+                <td mat-cell *matCellDef="let userPermission"> {{userPermission.type}}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{'USER_ROLE_NAME' | translate}} </th>
+                <td mat-cell *matCellDef="let userPermission">
+                    <span *ngIf="userPermission.type === 'User'"> {{userPermission.user?.firstName}}
+                        {{userPermission.user?.lastName}}
+                    </span>
+                    <span *ngIf="userPermission.type === 'Role'">
+                        {{userPermission.role?.name}}
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef> {{'EMAIL' | translate}} </th>
+                <td mat-cell *matCellDef="let userPermission">
+                    <span *ngIf="userPermission.type === 'User'">
+                        {{userPermission.user?.email}}
+                    </span>
+                    <span *ngIf="userPermission.type === 'Role'">
+                        --
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef> {{'START_DATE' | translate}} </th>
+                <td mat-cell *matCellDef="let userPermission">
+                    <ng-container *ngIf="userPermission.isTimeBound">
+                        {{userPermission.startDate | utcToLocalTime:'shortDate'}}
+                    </ng-container>
+                    <ng-container *ngIf="!userPermission.isTimeBound">
+                        --
+                    </ng-container>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="endDate">
+                <th mat-header-cell *matHeaderCellDef> {{'END_DATE' | translate}} </th>
+                <td mat-cell *matCellDef="let userPermission">
+                    <ng-container *ngIf="userPermission.isTimeBound">
+                        {{userPermission.endDate | utcToLocalTime:'shortDate'}}
+                    </ng-container>
+                    <ng-container *ngIf="!userPermission.isTimeBound">
+                        --
+                    </ng-container>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="7" *matFooterCellDef>
+                    <mat-paginator #userPermissionsPaginator [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+                </td>
+            </ng-container>
+            <tr *matNoDataRow>
+                <td colspan="5">
+                    <div class="m-2">
+                        <b> {{'NO_DATA_FOUND' | translate}}</b>
+                    </div>
+                </td>
+            </tr>
+            <tr mat-header-row *matHeaderRowDef="documentPermissionsColumns;sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: documentPermissionsColumns;"></tr>
+            <tr mat-footer-row *matFooterRowDef="footerToDisplayed; sticky: true"></tr>
+        </table>
+    </div>
+</div>

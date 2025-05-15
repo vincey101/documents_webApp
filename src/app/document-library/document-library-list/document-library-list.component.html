@@ -1,0 +1,236 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row align-items-center">
+          <div class="col">
+              <span class="page-title">{{ "ASSIGNED_DOCUMENTS" | translate }}
+                <app-page-help-text code="ASSIGNED_DOCUMENTS"></app-page-help-text>
+              </span>
+          </div>
+          <div class="col-auto">
+            <ul class="breadcrumb-list">
+              <li class="breadcrumb-item bcrumb-1">
+                <button *hasClaim="'ASSIGNED_DOCUMENTS_CREATE_DOCUMENT'" [routerLink]="['/add']"
+                  class="btn btn-success btn-sm m-r-10">
+                  <i-feather name="Plus" class="btn-success small-icon"></i-feather>
+                  <span> {{'ADD_DOCUMENT' | translate}}</span>
+                </button>
+                <a *hasClaim="'ASSIGNED_DOCUMENTS_ADD_REMINDER'" (click)="onReminderList()"
+                  class="btn btn-danger btn-sm m-r-10 text-white">
+                  <i-feather name="list" class="btn-danger w-18 h-18"></i-feather>
+                  <span class="d-none d-sm-inline"> {{'MY_REMINDERS' | translate}}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="body">
+            <div class="row margin-2">
+              <div class="col-md-3">
+                <input class="form-control" placeholder="{{'SEARCH_DOCUMENT_BY_NAME_OR_DESCRIPTION' | translate}}"
+                  #input>
+              </div>
+              <div class="col-md-3">
+                <input class="form-control" placeholder="{{'SEARCH_DOCUMENT_BY_META_TAGS' | translate}}" #metatag>
+              </div>
+              <div class="col-md-3">
+                <ng-select (change)="onCategoryChange($event)" placeholder="{{'SELECT_CATEGORY' | translate}}">
+                  <ng-option *ngFor="let category of categoryStore.categories()" [value]="category.id">
+                    <div class="country-item"
+                      [ngStyle]="this.direction === 'rtl'? {'margin-right.px': category.deafLevel* 20} : {'margin-left.px': category.deafLevel* 20}">
+                      <div *ngIf="!category.parentId">
+                        <b> {{category.name}}</b>
+                      </div>
+                      <div *ngIf="category.parentId">
+                        {{category.name}}
+                      </div>
+                    </div>
+                  </ng-option>
+                </ng-select>
+              </div>
+              <div class="col-md-3">
+                <ng-select (change)="onStorageChange($event)" placeholder="{{'STORAGE' | translate}}">
+                  <ng-option [value]="'local'">{{'LOCAL' | translate}}</ng-option>
+                  <ng-option [value]="'s3'">{{'S3' | translate}}</ng-option>
+                </ng-select>
+              </div>
+              <div class="col-md-3">
+                <ng-select (change)="onClientChange($event)" placeholder="{{ 'SELECT_CLIENT' | translate }}">
+                  <ng-option *ngFor="let client of clientStore.clients()" [value]="client.id">
+                    <span> {{ client.companyName }} </span>
+                  </ng-option>
+                </ng-select>
+              </div>
+              <div class="col-md-3">
+                <ng-select (change)="onDocumentStatusChange($event)" placeholder="{{'SELECT_STATUS' | translate}}">
+                  <ng-option *ngFor="let documentStatus of documentStatusStore.statusList()"
+                    [value]="documentStatus.id">
+                    <span [ngStyle]="{'color': documentStatus?.colorCode}"> {{
+                      documentStatus.name }} </span>
+                  </ng-option>
+                </ng-select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="table-responsive">
+                  <div class="grid-height-small">
+                    <table mat-table [dataSource]="dataSource" class="w-100" matSort matSortActive="createdDate"
+                      matSortDirection="desc" matSortDisableClear>
+                      <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef>{{'ACTION' | translate}} </th>
+                        <td class="table-column-fix-100" mat-cell *matCellDef="let document">
+                          <div class="row">
+                            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Action">
+                              <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu">
+                              <button class="btn btn-light btn-sm" mat-menu-item (click)="onDocumentView(document)"
+                                type="button">
+                                <mat-icon>visibility</mat-icon>
+                                {{'VIEW' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_VIEW_DETAIL'" class="btn btn-light btn-sm"
+                                mat-menu-item [routerLink]="['/document-details', document.id]" type="button">
+                                <mat-icon>info</mat-icon>
+                                {{'DETAILS' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_EDIT_DOCUMENT'" mat-menu-item
+                                class="btn btn-light btn-sm" (click)="editDocument(document)">
+                                <mat-icon>edit</mat-icon>
+                                {{'EDIT' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_SHARE_DOCUMENT'" mat-menu-item
+                                class="btn btn-light btn-sm" (click)="manageDocumentPermission(document)" type="button">
+                                <mat-icon>share</mat-icon>
+                                {{'SHARE'| translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_MANAGE_SHARABLE_LINK'" mat-menu-item
+                                (click)="onCreateShareableLink(document)">
+                                <mat-icon> link</mat-icon>
+                                {{'GET_SHAREABLE_LINK' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_UPLOAD_NEW_VERSION'" mat-menu-item
+                                class="btn btn-light btn-sm" (click)="uploadNewVersion(document)" type="button">
+                                <mat-icon>upload</mat-icon>
+                                {{'UPLOAD_NEW_VERSION_FILE' | translate}}
+                              </button>
+                              <button mat-menu-item *hasClaim="'ASSIGNED_DOCUMENTS_VIEW_VERSION_HISTORY'"
+                                (click)="onVersionHistoryClick(document)">
+                                <mat-icon> history</mat-icon>
+                                {{'VERSION_HISTORY' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_MANAGE_COMMENT'" class="btn btn-light btn-sm"
+                                mat-menu-item (click)="addComment(document)" type="button">
+                                <mat-icon> chat</mat-icon>
+                                {{'COMMENT' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_ADD_REMINDER'" class="btn btn-light btn-sm"
+                                mat-menu-item (click)="addReminder(document)" type="button">
+                                <mat-icon>notifications</mat-icon>
+                                {{'ADD_REMINDER' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_SEND_EMAIL'" class="btn btn-light btn-sm"
+                                mat-menu-item (click)="sendEmail(document)" type="button">
+                                <mat-icon>forward_to_inbox</mat-icon>
+                                {{'SEND_EMAIL' | translate}}
+                              </button>
+                              <button *hasClaim="'ALL_DOCUMENTS_ARCHIVE_DOCUMENT'" mat-menu-item
+                                class="btn btn-light btn-sm" (click)="archiveDocument(document)" type="button">
+                                <mat-icon>archive</mat-icon>
+                                {{'ARCHIVE' | translate}}
+                              </button>
+                              <button *hasClaim="'ASSIGNED_DOCUMENTS_DELETE_DOCUMENT'" mat-menu-item
+                                class="btn btn-light btn-sm" (click)="deleteDocument(document)" type="button">
+                                <mat-icon>delete</mat-icon>
+                                {{'DELETE' | translate}}
+                              </button>
+                            </mat-menu>
+                            <ng-container *ngIf="document.commentCount > 0">
+                              <button *hasClaim="'ALL_DOCUMENTS_MANAGE_COMMENT'" (click)="addComment(document)"
+                                mat-icon-button class="ms-2" aria-label="Comments">
+                                <mat-icon>chat</mat-icon>
+                              </button>
+                            </ng-container>
+                            <ng-container *ngIf="document.versionCount > 0">
+                              <button (click)="onVersionHistoryClick(document)" mat-icon-button class="ms-2"
+                                *hasClaim="'ALL_DOCUMENTS_MANAGE_COMMENT'" aria-label="History">
+                                <mat-icon>history</mat-icon>
+                              </button>
+                            </ng-container>
+                          </div>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'NAME' | translate}} </th>
+                        <td mat-cell *matCellDef="let document">
+                          <a class="doc-link" (click)="onDocumentView(document)">{{document.name}}</a>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="categoryName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'CATEGORY_NAME' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document.categoryName}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="location">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'STORAGE' | translate}}</th>
+                        <td mat-cell *matCellDef="let document"> {{document.location.toUpperCase() | translate}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="companyName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'CLIENT' | translate}}</th>
+                        <td mat-cell *matCellDef="let document"> {{document?.companyName | translate}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="statusName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'STATUS' | translate}}</th>
+                        <td mat-cell *matCellDef="let document"> <span [ngStyle]="{'color': document?.colorCode}">
+                            {{document?.statusName | translate}} </span> </td>
+                      </ng-container>
+                      <ng-container matColumnDef="createdDate">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'CREATED_DATE' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document?.createdDate | utcToLocalTime:'shortDate'}}
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="expiredDate">
+                        <th mat-header-cell *matHeaderCellDef> {{'EXPIRED_DATE' | translate}} </th>
+                        <td class="text-danger" mat-cell *matCellDef="let document">
+                          {{ getExpiryDate(document.maxRolePermissionEndDate , document.maxUserPermissionEndDate) |
+                          utcToLocalTime:'shortDate'}}
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="createdBy">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'CREATED_BY' | translate}} </th>
+                        <td mat-cell *matCellDef="let document"> {{document?.createdByName}} </td>
+                      </ng-container>
+                      <ng-container matColumnDef="footer">
+                        <td mat-footer-cell colspan="9" *matFooterCellDef>
+                          <mat-paginator [length]="documentResource.totalCount" [pageSize]="documentResource.pageSize"
+                            [pageSizeOptions]="[10, 20, 30]">
+                          </mat-paginator>
+                        </td>
+                      </ng-container>
+                      <tr *matNoDataRow>
+                        <td colspan="8">
+                          <div class="m-2">
+                            <b> {{'NO_DATA_FOUND' | translate}}</b>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                      <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky: true"></tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

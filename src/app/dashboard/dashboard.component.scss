@@ -1,0 +1,30 @@
+/* Structure */
+
+.p-2 {
+    padding: 0.5rem !important;
+}
+
+.widget-column {
+    flex          : 1 1 15%;
+    text-align    : center;
+    padding       : 15px;
+    display       : flex;
+    color         : #fff;
+    flex-direction: column;
+    border-radius : 5px;
+    cursor        : pointer;
+
+    .count {
+        font-size    : 35px;
+        margin-bottom: 12px;
+    }
+
+    .column-text {
+        font-size: 20px;
+        color    : #fff;
+    }
+}
+
+.chart-div {
+    height: 60vh;
+}

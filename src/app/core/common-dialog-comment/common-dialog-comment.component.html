@@ -1,0 +1,41 @@
+<div class="d-flex">
+  <h5 mat-dialog-title class="confirm-dialog-title text-danger">
+    {{primaryMessage}}
+  </h5>
+  <button mat-icon-button class="close-button ms-auto" (click)="onCancel()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="confirm-dialog-content">
+  <form [formGroup]="commentForm" novalidate>
+    <div *ngIf="note">
+      <i-feather name="alert-triangle" class="text-warning"></i-feather>
+      <span class="text-warning">
+        {{note}}
+      </span>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <div class="col-md-12">
+          <label class="form-label" for="categoryName">{{'COMMENT' | translate}}</label>
+          <textarea class="form-control" formControlName="comment" rows="3"></textarea>
+          <div class="text-danger"
+            *ngIf="commentForm.get('comment').touched && commentForm.get('comment').hasError('required')">
+            {{'COMMENT_IS_REQUIRED' | translate}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<div mat-dialog-actions>
+  <button (click)="clickHandler(true)" type="submit" class="btn btn-success btn-sm m-r-10">
+    <i-feather name="check" class="small-icon"></i-feather>
+    {{'YES' | translate}}
+  </button>
+  <button (click)="onCancel()" type="submit" class="btn btn-sm btn-danger">
+    <i-feather name="x-circle" class="small-icon"></i-feather>
+    {{'CANCEL' | translate}}
+  </button>
+</div>

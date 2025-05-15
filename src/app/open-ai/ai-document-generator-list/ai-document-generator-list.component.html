@@ -1,0 +1,84 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">
+          {{ "AI_DOCUMENTS" | translate }}
+          <app-page-help-text code="AI_DOCUMENTS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="header">
+        <div class="m-2 col-sm-5">
+          <input class="form-control" placeholder="{{'SEARCH_BY_PROMPT' | translate}}" #input>
+        </div>
+      </div>
+      <div class="body">
+        <div class="table-responsive">
+          <div class="grid-height-small">
+            <table mat-table [dataSource]="dataSource" class="w-100" matSort matSortActive="createdDate"
+              matSortDirection="desc" matSortDisableClear>
+              <ng-container matColumnDef="action">
+                <th class="table-column-fix-200" mat-header-cell *matHeaderCellDef>
+                  {{ "ACTION" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <button (click)="viewAiDocument(element)" class="btn btn-primary btn-sm me-2" type="button">
+                    <i-feather name="eye" class="small-icon"></i-feather>
+                    <span class="d-none d-sm-inline"> {{ "VIEW" | translate }}</span>
+                  </button>
+                  <button *hasClaim="'DELETE_AI_GENERATED_DOCUMENTS'" (click)="deleteAiDocument(element)"
+                    class="btn btn-danger btn-sm" type="button">
+                    <i-feather name="trash" class="small-icon"></i-feather>
+                    <span class="d-none d-sm-inline"> {{ "DELETE" | translate }}</span>
+                  </button>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="prompt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "PROMPT_INPUT" | translate }}</th>
+                <td mat-cell *matCellDef="let element"><span [title]="element.prompt"> {{ element.prompt | limitTo :'80'}}</span></td>
+              </ng-container>
+              <ng-container matColumnDef="language">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "AI_LANGUAGE" | translate }}</th>
+                <td mat-cell *matCellDef="let element">{{ element.language}}</td>
+              </ng-container>
+              <ng-container matColumnDef="creativity">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "CREATIVITY" | translate }}</th>
+                <td mat-cell *matCellDef="let element">{{ element.creativity}}</td>
+              </ng-container>
+              <ng-container matColumnDef="toneOfVoice">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "TONE_OF_VOICE" | translate }}</th>
+                <td mat-cell *matCellDef="let element">{{ element.toneOfVoice}}</td>
+              </ng-container>
+              <ng-container matColumnDef="maximumLength">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "MAXIMUM_LENGTH" | translate }}</th>
+                <td mat-cell *matCellDef="let element">{{ element.toneOfVoice}}</td>
+              </ng-container>
+              <ng-container matColumnDef="createdAt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "CREATED_DATE" | translate }}</th>
+                <td mat-cell *matCellDef="let element">{{ element.createdAt | utcToLocalTime:'full' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="11" *matFooterCellDef>
+                  <mat-paginator [length]="openAiDocumentResource.totalCount"
+                    [pageSize]="openAiDocumentResource.pageSize" [pageSizeOptions]="[10, 20, 30]"></mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="11">
+                  <div class="m-2">
+                    <b> {{ "NO_DATA_FOUND" | translate }}</b>
+                  </div>
+                </td>
+              </tr>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [class.bg-warning1]="row.status === 1"></tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

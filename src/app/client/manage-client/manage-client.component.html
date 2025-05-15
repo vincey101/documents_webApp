@@ -1,0 +1,121 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span *ngIf="!isEditMode" class="mb-0 page-title">{{
+          "ADD_CLIENT" | translate
+        }}</span>
+        <span *ngIf="isEditMode" class="mb-0 page-title">{{
+          "EDIT_CLIENT" | translate
+        }}</span>
+        <app-page-help-text [code]="'MANAGE_CLIENT'"></app-page-help-text>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <form [formGroup]="clientForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ "COMPANY_PERSON_NAME" | translate }}</label>
+                <input
+                  formControlName="companyName"
+                  class="form-control"
+                  type="text"
+                />
+                <div
+                  *ngIf="
+                    clientForm.get('companyName').touched &&
+                    clientForm.get('companyName').errors
+                  "
+                >
+                  <div
+                    class="text-danger"
+                    *ngIf="clientForm.get('companyName').errors?.['required']"
+                  >
+                    {{ "COMPANY_PERSON_NAME_IS_REQUIRED" | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ "CONTACT_PERSON" | translate }}</label>
+                <input
+                  formControlName="contactPerson"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                  <label>{{ "EMAIL" | translate }}</label>
+                  <input
+                    formControlName="email"
+                    class="form-control"
+                    type="email"
+                  />
+                  <div
+                    *ngIf="
+                      clientForm.get('email').touched &&
+                      clientForm.get('email').errors
+                    "
+                  >
+                    <div
+                      class="text-danger"
+                      *ngIf="clientForm.get('email').errors?.['email']"
+                    >
+                      {{ "PLEASE_ENTER_VALID_EMAIL" | translate }}
+                    </div>
+                    <div
+                      class="text-danger"
+                      *ngIf="clientForm.get('email').errors?.['required']"
+                    >
+                      {{ "EMAIL_IS_REQUIRED" | translate }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ "MOBILE_NUMBER" | translate }}</label>
+                <input
+                  formControlName="phoneNumber"
+                  class="form-control"
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ "ADDRESS" | translate }}</label>
+                <textarea formControlName="address" class="form-control">
+                </textarea>
+              </div>
+            </div>
+            <div class="m-top-10 col-md-12">
+              <button
+                class="btn btn-success btn-sm me-2"
+                (click)="saveClient()"
+                cdkFocusInitial
+              >
+                <i-feather name="save" class="small-icon"></i-feather>
+                {{ "SAVE" | translate }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                [routerLink]="['/client']"
+              >
+                <i-feather name="x-circle" class="small-icon"></i-feather>
+                {{ "CANCEL" | translate }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

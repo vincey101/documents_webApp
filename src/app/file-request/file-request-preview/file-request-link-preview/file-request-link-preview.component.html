@@ -1,0 +1,183 @@
+<nav #navbar class="navbar active">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <!-- mobile menu bars -->
+      <a onClick="return false;" class="bars" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
+      <a class="navbar-brand" routerLink="/">
+        <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="logo-img" />
+        <img *ngIf="!logoUrl" src="assets/images/logo.png" alt="logo" class="logo-lg">
+      </a>
+    </div>
+  </div>
+</nav>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">
+          {{ 'FILE_UPLOAD_REQUEST' | translate }}
+        </span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <!-- Link Expired Message -->
+        <div *ngIf="isLinkExpired" class="text-center text-danger">
+          <h2>{{ 'LINK_EXPIRED' | translate }}</h2>
+          <p>{{ 'URL_NOT_VALID' | translate }}</p>
+          <a class="btn btn-primary mt-3" [routerLink]="['/']">
+            {{ 'GO_HOME' | translate }}
+          </a>
+        </div>
+
+        <!-- File Upload Section -->
+        <div *ngIf="!isLinkExpired">
+          <!-- Password Verification -->
+          <div *ngIf="requiresPassword && !isPasswordVerified">
+            <form [formGroup]="documentLinkForm" class="mb-4">
+              <div class="form-group">
+                <label>{{ 'PASSWORD' | translate }}</label>
+                <input type="password" class="form-control" formControlName="password"
+                  placeholder="{{ 'PASSWORD' | translate }}" />
+                <div *ngIf="
+                    documentLinkForm.get('password')?.touched &&
+                    documentLinkForm.get('password')?.hasError('required')
+                  " class="text-danger">{{ 'PASSWORD_IS_REQUIRED' | translate }}
+                </div>
+                <button class="btn btn-primary mt-2" (click)="checkPassword()">
+                  <i-feather name="lock" class="small-icon"></i-feather>
+                  {{ 'SUBMIT' | translate }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- File Upload Form -->
+          <div *ngIf="!requiresPassword || isPasswordVerified">
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>{{ 'SUBJECT' | translate }}</th>
+                    <th>{{ 'ALLOW_FILE_TYPE' | translate }}</th>
+                    <th>{{ 'REQUEST_BY' | translate }}</th>
+                    <th>{{ 'MAXIMUM_FILE_SIZE_UPLOAD' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ fileRequestInfo?.subject }}</td>
+                    <td>{{ fileRequestInfo?.allowExtension }}</td>
+                    <td>{{ fileRequestInfo?.createdByName }}</td>
+                    <td>{{ fileRequestInfo?.sizeInMb }} Mb</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-12 d-flex justify-content-end mb-2" *ngIf="!requiresPassword || isPasswordVerified">
+              <button class="btn btn-primary me-2" type="button" (click)="addFileInput()"
+                *ngIf="fileInputs.length < fileRequestInfo?.maxDocument - fileRequestDocuments.length">
+                <i-feather name="plus" class="small-icon"></i-feather>
+                {{ 'ADD_ANOTHER_FILE' | translate }}
+              </button>
+            </div>
+            <form [formGroup]="uploadForm"
+              *ngIf="fileRequestInfo?.maxDocument - fileRequestDocuments.length >= fileInputs.length" class="mt-4">
+              <div class="row g-3" formArrayName="files">
+                <div *ngFor="let fileInput of fileInputs.controls; let i = index" [formGroupName]="i" class="col-12">
+                  <div class="card shadow-sm">
+                    <div class="row align-items-center">
+                      <!-- File Input -->
+                      <div class="col-md-6 mb-2">
+                        <label for="{{ 'fileInput-' + i }}">{{'DOCUMENT_UPLOAD' | translate}}</label>
+                        <input type="file" formControlName="file" class="form-control" [id]="'fileInput-' + i"
+                          (change)="onFileSelected($event, i)" />
+                        <div *ngIf="fileInput.get('file')?.touched && fileInput.get('file')?.hasError('required')"
+                          class="text-danger small mt-1">
+                          {{ "FILE_IS_REQUIRED" | translate }}
+                        </div>
+                        <div *ngIf="fileInput.get('file')?.touched && fileInput.get('file')?.hasError('sizeExceeded')"
+                          class="text-danger small mt-1">
+                          {{ "FILE_SIZE_EXCEEDED" | translate }}
+                        </div>
+                        <div
+                          *ngIf="fileInput.get('file')?.touched && fileInput.get('file')?.hasError('invalidExtension')"
+                          class="text-danger small mt-1">
+                          {{ "INVALID_FILE_EXTENSION" | translate }}
+                        </div>
+                      </div>
+
+                      <!-- File Name Input -->
+                      <div class="col-md-5 mb-2">
+                        <label>
+                          {{ 'FILE_NAME' | translate }}
+                        </label>
+                        <input type="text" class="form-control" formControlName="name"
+                          [value]="uploadedFileNames[i] || ''" placeholder="{{ 'SELECTED_FILE_NAME' | translate }}"
+                          [(ngModel)]="uploadedFileNames[i]" />
+                        <div *ngIf="fileInput.get('name')?.touched && fileInput.get('name')?.hasError('required')"
+                          class="text-danger small mt-1">
+                          {{ "NAME_IS_REQUIRED" | translate }}
+                        </div>
+                      </div>
+
+                      <!-- Remove Button -->
+                      <div class="col-md-1 text-end">
+                        <button *ngIf="i > 0" class="btn btn-danger btn-sm" type="button" (click)="removeFileInput(i)"
+                          aria-label="Remove">
+                          <i-feather name="trash" class="small-icon"></i-feather>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div *ngIf="fileRequestDocuments.length < fileRequestInfo?.maxDocument" class="mt-4">
+                <button class="btn btn-success me-2" type="button" [disabled]="uploadedFiles.length === 0"
+                  (click)="onFileUpload()">
+                  <i-feather name="upload" class="small-icon"></i-feather>
+                  {{ 'UPLOAD_FILES' | translate }}
+                </button>
+                <button class="btn btn-danger" type="button" [routerLink]="['/']">
+                  <i-feather name="x-circle" class="small-icon"></i-feather>
+                  {{ 'CANCEL' | translate }}
+                </button>
+              </div>
+            </form>
+
+
+            <!-- Uploaded Files Table -->
+            <div *ngIf="fileRequestDocuments.length > 0" class="mt-4">
+              <h5>{{ 'UPLOADED_FILES' | translate }}</h5>
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>{{ 'FILE_NAME' | translate }}</th>
+                    <th>{{ 'DOCUMENT_STATUS' | translate }}</th>
+                    <th>{{ 'UPLOADED_DATE' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let file of fileRequestDocuments">
+                    <td>{{ file.name }}</td>
+                    <td [appStatusColor]="file.fileRequestDocumentStatus | fileRequestDocumentStatus">{{
+                      file.fileRequestDocumentStatus | fileRequestDocumentStatus | translate }}</td>
+                    <td>{{ file.createdDate | utcToLocalTime:'full' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="spinner-container" *ngIf="isLoading">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>

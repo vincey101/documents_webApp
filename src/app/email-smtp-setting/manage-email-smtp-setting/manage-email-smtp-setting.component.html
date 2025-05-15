@@ -1,0 +1,127 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <span *ngIf="!isEditMode" class="mb-0 page-title">{{'ADD_EMAIL_SMTP_SETTING' |
+              translate}}<app-page-help-text code="MANAGE_EMAIL_SMTP_SETTING"></app-page-help-text></span>
+            <span *ngIf="isEditMode" class="mb-0 page-title">{{'EDIT_EMAIL_SMTP_SETTING' |
+              translate}}<app-page-help-text code="MANAGE_EMAIL_SMTP_SETTING"></app-page-help-text></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="body">
+            <form [formGroup]="smtpSettingForm">
+              <div class="box box-primary">
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <label class="form-label"> {{'HOST' | translate}}</label>
+                      <input placeholder="smtp.example.com" formControlName="host" class="form-control" type="text">
+                      <div *ngIf="smtpSettingForm.get('host').touched && smtpSettingForm.get('host').errors">
+                        <div class="text-danger" *ngIf="smtpSettingForm.get('host').errors?.['required']">
+                          {{'HOST_IS_REQUIRED' | translate}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label"> {{'PORT' | translate}}</label>
+                      <input formControlName="port" class="form-control" type="number">
+                      <div *ngIf="smtpSettingForm.get('port').touched && smtpSettingForm.get('port').errors">
+                        <div class="text-danger" *ngIf="smtpSettingForm.get('port').errors?.['required']">
+                          {{'PORT_IS_REQUIRED' | translate}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">{{'USER_NAME' | translate}}</label>
+                      <input formControlName="userName" class="form-control" type="text">
+                      <div *ngIf="smtpSettingForm.get('userName').touched && smtpSettingForm.get('userName').errors">
+                        <div class="text-danger" *ngIf="smtpSettingForm.get('userName').errors?.['required']">
+                          {{'USER_NAME_IS_REQUIRED' | translate}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">{{'PASSWORD' | translate}}</label>
+                      <input autocomplete="new-password" formControlName="password" class="form-control"
+                        type="password">
+                      <div *ngIf="smtpSettingForm.get('password').touched && smtpSettingForm.get('password').errors">
+                        <div class="text-danger" *ngIf="smtpSettingForm.get('password').errors?.['required']">
+                          {{'PASSWORD_IS_REQUIRED' | translate}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">{{'ENCRYPTION' | translate}}</label>
+                      <ng-select formControlName="encryption" placeholder="{{'ENCRYPTION' | translate}}">
+                        <ng-option [value]="''"> None </ng-option>
+                        <ng-option [value]="'ssl'"> ssl </ng-option>
+                        <ng-option [value]="'tls'"> tls </ng-option>
+                        <ng-option [value]="'starttls'"> starttls </ng-option>
+                      </ng-select>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label class="form-label">{{ "FROM_EMAIL" | translate }}</label>
+                        <input formControlName="fromEmail" class="form-control" type="email" />
+                        <div class="text-danger"
+                          *ngIf="smtpSettingForm.get('fromEmail').touched  && smtpSettingForm.get('fromEmail')?.hasError('required')">
+                          {{'FROM_EMAIL_IS_REQUIRED' | translate}}
+                        </div>
+                        <div class="text-danger"
+                          *ngIf="smtpSettingForm.get('fromEmail').touched  && smtpSettingForm.get('fromEmail')?.hasError('email')">
+                          {{'PLEASE_ENTER_VALID_EMAIL' | translate}}
+                        </div>
+
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">{{'FROM_NAME' | translate}}</label>
+                      <input autocomplete="new-password" formControlName="fromName" class="form-control" type="text">
+                    </div>
+                    <div class="col-md-4 status-switch">
+                      <div class="form-group">
+                        <mat-slide-toggle color="primary" formControlName="isDefault">
+                          <span *ngIf="smtpSettingForm.get('isDefault').value">
+                            {{'IS_DEFAULT' | translate}}
+                          </span>
+                          <span *ngIf="!smtpSettingForm.get('isDefault').value">
+                            {{'IS_DEFAULT' | translate}}
+                          </span>
+                        </mat-slide-toggle>
+                      </div>
+                    </div>
+                    <div class="m-top-10 col-md-12">
+                      <ng-container *ngIf="isEditMode">
+                        <button class="btn btn-success btn-sm m-r-10" (click)="saveEmailSMTPSetting()"
+                          cdkFocusInitial><i-feather name="save" class="small-icon"></i-feather>
+                          {{'TEST_AND_SAVE' | translate}}
+                        </button>
+                      </ng-container>
+                      <ng-container *ngIf="!isEditMode">
+                        <button class="btn btn-success btn-sm m-r-10" (click)="saveEmailSMTPSetting()"
+                          cdkFocusInitial><i-feather name="save" class="small-icon"></i-feather>
+                          {{'TEST_AND_SAVE' | translate}}
+                        </button>
+                      </ng-container>
+                      <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/email-smtp']">
+                        <i-feather name="x-circle" class="small-icon"></i-feather>
+                        {{'CANCEL' | translate}}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

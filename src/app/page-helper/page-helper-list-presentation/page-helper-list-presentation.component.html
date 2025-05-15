@@ -1,0 +1,54 @@
+<section class="content">
+  <div class="block-header">
+    <div class="breadcrumb-main">
+      <div class="row">
+        <div class="col-6">
+          <div class="mb-2">
+            <span class="page-title">{{ "PAGE_HELPER" | translate }}
+              <app-page-help-text code="PAGE_HELPERS"></app-page-help-text> </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="body">
+      <div class="table-responsive">
+        <div class="grid-height-large">
+          <table mat-table [dataSource]="pageHelpers" multiTemplateDataRows>
+            <ng-container matColumnDef="action">
+              <th class="table-column-fix-188" mat-header-cell *matHeaderCellDef>
+                {{ "ACTION" | translate }}
+              </th>
+              <td mat-cell *matCellDef="let element">
+                <button (click)="managePageHelper(element)" class="btn btn-success btn-sm me-2" type="button">
+                  <i-feather name="edit" class="small-icon"></i-feather>
+                  <span class="d-none d-sm-inline"> {{'EDIT' | translate}} </span>
+                </button>
+                <button (click)="viewPageHelper(element)" class="btn btn-primary btn-sm me-2" type="button">
+                  <i-feather name="eye" class="small-icon"></i-feather>
+                  <span class="d-none d-sm-inline">  {{ "VIEW" | translate }}</span>
+                </button>
+              </td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>
+                {{ "NAME" | translate }}
+              </th>
+              <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+            </ng-container>
+            <ng-container matColumnDef="code">
+              <th mat-header-cell *matHeaderCellDef>
+                {{ "CODE" | translate }}
+              </th>
+              <td mat-cell *matCellDef="let element">{{ element.code }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

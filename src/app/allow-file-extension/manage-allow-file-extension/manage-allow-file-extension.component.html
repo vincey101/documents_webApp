@@ -1,0 +1,88 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span *ngIf="!isEditMode" class="mb-0 page-title">
+          {{ "ADD_ALLOW_FILE_EXTENSIONS" | translate }}
+          <app-page-help-text code="MANAGE_ALLOW_FILE_EXTENSION"></app-page-help-text>
+        </span>
+        <span *ngIf="isEditMode" class="mb-0 page-title">
+          {{ "EDIT_ALLOW_FILE_EXTENSIONS" | translate }}
+          <app-page-help-text code="MANAGE_ALLOW_FILE_EXTENSION"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <form [formGroup]="allowFileExtensionForm">
+          <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-success btn-sm me-2" (click)="addExtensionField()">
+              <i-feather name="plus" class="medium-icon"></i-feather>
+              {{ "ADD_EXTENSION" | translate }}
+            </button>
+          </div>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label> {{ "FILE_TYPE" | translate }}</label>
+                <mat-select panelClass="mat-select-control" placeholder="{{ 'FILE_TYPE' | translate }}"
+                  class="form-control" formControlName="fileType">
+                  <mat-option *ngFor="let fileType of fileTypes" [value]="fileType.value">
+                    {{ fileType.key | translate }}
+                  </mat-option>
+                </mat-select>
+                <div *ngIf="
+                    allowFileExtensionForm.get('fileType')?.touched
+                    && allowFileExtensionForm.get('fileType')?.hasError('required')
+                  " class="text-danger">
+                  {{ "FILE_TYPE_IS_REQUIRED" | translate }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label> {{ "EXTENSIONS" | translate }}</label>
+              <div formArrayName="extensions" class="mb-2">
+                <div class="row">
+                  <div [formGroupName]="i" *ngFor="let control of extensions.controls; let i = index"
+                    class="col-md-2 col-sm-3  col-xs-6 mb-2">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="d-flex justify-content-between">
+                          <input formControlName="extension" class="form-control" type="text"
+                            placeholder="{{ 'ENTER_EXTENSION' | translate }}" />
+                          <button type="button" class="btn btn-sm" (click)="removeExtensionField(i)">
+                            <i-feather name="trash" class="small-icon text-danger"></i-feather>
+                          </button>
+                        </div>
+                        <div *ngIf="control.get('extension')?.touched && control.get('extension')?.hasError('required')"
+                          class="text-danger">
+                          {{ "EXTENSION_IS_REQUIRED" | translate }}
+                        </div>
+                        <div *ngIf="control.get('extension')?.touched && control.get('extension')?.hasError('pattern')"
+                          class="text-danger">
+                          {{ "SPECIAL_CHARACTER_NOT_ALLOWED" | translate }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="m-top-10 col-md-12">
+            <button class="btn btn-success btn-sm me-2" (click)="saveAllowFileExtension()" cdkFocusInitial>
+              <i-feather name="save" class="small-icon"></i-feather>
+              {{ "SAVE" | translate }}
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/allow-file-extension']">
+              <i-feather name="x-circle" class="small-icon"></i-feather>
+              {{ "CANCEL" | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

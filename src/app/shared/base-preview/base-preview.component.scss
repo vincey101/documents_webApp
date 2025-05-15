@@ -1,0 +1,50 @@
+@import "../../../assets/scss/variables.scss";
+
+:host ::ng-deep #aligner {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+
+.file-preview-toolbar {
+  top: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  color: var(--be-accent-contrast);
+  height: 60px;
+  padding: 0 15px;
+  background: $text-primary;
+  z-index: 10;
+}
+
+.back-arrow {
+  color: #ffff;
+  font-size: x-large;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.rtl {
+  .back-arrow {
+    margin-left: 10px;
+  }
+}
+
+.download-button {
+  position: absolute;
+  right: 30px;
+}
+
+.file-name {
+  color: #fff;
+  margin-left: 10px;
+}
+
+.rtl {
+  .file-name {
+    margin-right: 10px;
+  }
+}

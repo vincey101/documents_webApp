@@ -1,0 +1,109 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title">{{'APPROVE_ADD_DOCUMENT' | translate}}<app-page-help-text
+      code="ADD_DOCUMENT"></app-page-help-text></span>
+  <button mat-icon-button class="ms-auto" (click)="closeDialog()">
+    <i-feather class="close-icon text-danger" name="x"></i-feather>
+  </button>
+</div>
+<mat-dialog-content>
+  <form [formGroup]="documentForm">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>{{'NAME' | translate}}</label>
+          <input formControlName="name" class="form-control" type="text">
+          <div *ngIf="documentForm.get('name').touched && documentForm.get('name').errors">
+            <div class="text-danger" *ngIf="documentForm.get('name').errors?.['required']">
+              {{'NAME_IS_REQUIRED' | translate}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>{{'CATEGORY' | translate}}</label>
+          <ng-select formControlName="categoryId" placeholder="{{'CATEGORY' | translate}}">
+            <ng-option *ngFor="let category of categoryStore.categories()" [value]="category.id">
+              <div class="country-item"
+                [ngStyle]="this.direction === 'rtl'? {'margin-right.px': category.deafLevel* 20} : {'margin-left.px': category.deafLevel* 20}">
+                <div *ngIf="!category.parentId">
+                  <b> {{category.name}}</b>
+                </div>
+                <div *ngIf="category.parentId">
+                  {{category.name}}
+                </div>
+              </div>
+            </ng-option>
+          </ng-select>
+          <div class="text-danger"
+            *ngIf="documentForm.get('categoryId').touched && documentForm.get('categoryId').hasError('required')">
+            {{'CATEGORY_IS_REQUIRED' | translate}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>{{ "STORAGE" | translate }}</label>
+          <ng-select formControlName="storageSettingId" [clearable]="false">
+            <ng-option [value]="'local'">{{"LOCAL" | translate }}</ng-option>
+            <ng-option *ngIf="isS3Supported" [value]="'s3'">{{"S3" | translate }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+      <div class="col-md-4 mt-2">
+        <label>{{ 'DOCUMENT_STATUS' | translate }}</label>
+        <ng-select formControlName="statusId" [searchable]="true" placeholder="{{ 'NONE' | translate }}">
+          <ng-option *ngFor="let documentStatus of documentStatusStore.statusList()" [value]="documentStatus.id">
+            <span [ngStyle]="{'color': documentStatus?.colorCode}"> {{ documentStatus.name }} </span>
+          </ng-option>
+        </ng-select>
+      </div>
+      <div class="col-md-4 mt-2">
+        <div class="form-group">
+          <label>{{ 'CLIENT' | translate }}</label>
+          <ng-select formControlName="clientId" placeholder="{{'CLIENT' | translate}}">
+            <ng-option *ngFor="let client of clientStore.clients()" [value]="client.id">
+              <span> {{ client.companyName }} </span>
+            </ng-option>
+          </ng-select>
+        </div>
+      </div>
+      <div class="col-md-4 mt-2">
+        <div class="" formArrayName="documentMetaTags"
+          *ngFor="let documentmetatag of documentMetaTagsArray.controls; let i=index">
+          <ng-container [formGroupName]="i">
+            <label *ngIf="i==0"> {{'META_TAGS' | translate}} </label>
+            <div class="row">
+              <div class="form-group col-md mb-1 col">
+                <input (change)="onMetatagChange($event,i)" formControlName="metatag" class="form-control" type="text">
+              </div>
+              <div class="form-group col-md-auto col-auto mb-1 pl-3 ps-0">
+                <button *ngIf="i==0" (click)="onAddAnotherMetaTag()" class="btn btn-success" type="button">
+                  <i-feather name="plus-circle" class="small-icon"></i-feather>
+                </button>
+                <button *ngIf="i!=0" (click)="onDeleteMetaTag(i)" class="btn btn-outline-danger" type="button">
+                  <i-feather name="trash-2" class="small-icon"></i-feather>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="col-md-12 mt-2">
+        <div class="form-group ">
+          <label>{{'DESCRIPTION' | translate}}</label>
+          <textarea formControlName="description" class="form-control">
+            </textarea>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="mt-2 col-md-12">
+        <button class="btn btn-success btn-sm me-2" (click)="saveDocument()" cdkFocusInitial>
+          <i-feather name="save" class="small-icon"></i-feather> {{'SAVE' | translate}}</button>
+        <button type="button" class="btn btn-danger btn-sm" (click)="closeDialog()">
+          <i-feather name="x-circle" class="small-icon"></i-feather> {{'CANCEL' | translate}}</button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>

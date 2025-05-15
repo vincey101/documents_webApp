@@ -1,0 +1,86 @@
+<div class="d-flex">
+  <span mat-dialog-title class="page-title">{{ "SHARE_DOCUMENT" | translate }}
+    <app-page-help-text code="SHARE_DOCUMENT"></app-page-help-text>
+  </span>
+  <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<div  mat-dialog-content>
+  <div class="row">
+    <div class="col-sm-12">
+      <h4> {{'SELECTED_DOCUMENTS' | translate}}</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <mat-chip-listbox>
+        <mat-chip *ngFor="let document of documents" color="primary">{{document.name}}</mat-chip>
+      </mat-chip-listbox>
+    </div>
+  </div>
+  <div class="row mt-2" [formGroup]="permissionForm">
+    <div class="col-md-6">
+      <label>{{'USERS' | translate}}</label>
+      <ng-select [multiple]="true" formControlName="users">
+        <ng-option *ngFor="let user of users" [value]="user.id">{{user.firstName}}
+          {{user.lastName}}({{user.userName}})</ng-option>
+      </ng-select>
+    </div>
+    <div class="col-md-6">
+      <label>{{'ROLES' | translate}}</label>
+      <ng-select formControlName="roles" [multiple]="true">
+        <ng-option *ngFor="let role of roles" [value]="role.id">
+          {{role.name}}
+        </ng-option>
+      </ng-select>
+    </div>
+    <div class="col-md-12">
+      <mat-checkbox (change)="timeBoundChange($event)" color="primary" formControlName="isTimeBound">
+        {{'SPACIFY_THE_PERIOD' | translate}}
+      </mat-checkbox>
+    </div>
+    <div class="row" *ngIf="permissionForm.get('isTimeBound').value">
+      <div class="col-md-6">
+        <input [min]="minDate" class="form-control" placeholder="{{'CHOOSE_A_START_DATE' | translate}}"
+          formControlName="startDate" [owlDateTimeTrigger]="date1" [owlDateTime]="date1">
+        <owl-date-time #date1></owl-date-time>
+        <div class="row">
+          <div class="col-md-12 m-t-10 m-b-10">
+            <mat-error
+              *ngIf="permissionForm.get('startDate').touched && permissionForm.get('startDate').errors?.['required']">
+              {{'START_DATE_IS_REQURED' | translate}}
+            </mat-error>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <input [min]="permissionForm.get('startDate').value" class="form-control"
+          placeholder="{{'CHOOSE_A_END_DATE' | translate}}" formControlName="endDate" [owlDateTimeTrigger]="date2"
+          [owlDateTime]="date2">
+        <owl-date-time #date2></owl-date-time>
+        <div class="row">
+          <div class="col-md-12 m-t-10 m-b-10">
+            <mat-error
+              *ngIf="permissionForm.get('endDate').touched && permissionForm.get('endDate').errors?.['required']">
+              {{'END_DATE_IS_REQURED' | translate}}
+            </mat-error>
+            <mat-error *ngIf="permissionForm.get('endDate').touched && permissionForm.get('endDate').errors?.['min']">
+              {{'END_DATE_SHOULD_BE_GREATER_THAN_TODAY_DATE' | translate}}
+            </mat-error>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <mat-checkbox color="primary" formControlName="isAllowDownload">{{'ALLOW_DOWNLOAD' | translate}}</mat-checkbox>
+    </div>
+    <div mat-dialog-actions class="m-r-10">
+      <button class="btn btn-success btn-sm m-r-10" (click)="saveDocumentUserPermission()" cdkFocusInitial>
+        <i-feather name="save" class="small-icon"></i-feather> {{'SAVE' | translate}}</button>
+      <button class="btn btn-danger btn-sm" (click)="closeDialog()">
+        <i-feather name="x-circle" class="small-icon"></i-feather>
+        {{'CANCEL' | translate}}</button>
+    </div>
+  </div>
+</div>

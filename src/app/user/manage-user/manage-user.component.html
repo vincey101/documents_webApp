@@ -1,0 +1,111 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row align-items-center">
+          <div class="col-md-6 mb-2">
+            <span *ngIf="!isEditMode" class="mb-0 page-title">{{'ADD_USER' | translate}}</span>
+            <span *ngIf="isEditMode" class="mb-0 page-title">{{'EDIT_USER' | translate}}</span>
+            <app-page-help-text [code]="'MANAGE_USER'"></app-page-help-text>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="body">
+            <form [formGroup]="userForm">
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label">{{'FIRST_NAME' | translate}}</label>
+                  <input formControlName="firstName" class="form-control" type="text">
+                  <div class="text-danger" *ngIf="userForm.get('firstName')?.touched &&
+                userForm.get('firstName')?.hasError('required')">
+                    {{'FIRST_NAME_IS_REQUIRED' | translate}}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{'LAST_NAME' | translate}}</label>
+                  <input formControlName="lastName" class="form-control" type="text">
+                  <div class="text-danger"
+                    *ngIf="userForm.get('lastName').touched && userForm.get('lastName')?.hasError('required')">
+                    {{'LAST_NAME_IS_REQUIRED' | translate}}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{'MOBILE_NUMBER' | translate}}</label>
+                  <input formControlName="phoneNumber" class="form-control" type="text">
+                  <div class="text-danger"
+                    *ngIf="userForm.get('phoneNumber').touched && userForm.get('phoneNumber')?.hasError('required')">
+                    {{"MOBILE_IS_REQUIRED" | translate}}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{'EMAIL' | translate}}</label>
+                  <input formControlName="email" class="form-control" type="email">
+                  <div class="text-danger"
+                    *ngIf="userForm.get('email').touched  && userForm.get('email')?.hasError('required')">
+                    {{'EMAIL_IS_REQUIRED' | translate}}
+                  </div>
+                  <div class="text-danger"
+                    *ngIf="userForm.get('email').touched  && userForm.get('email')?.hasError('email')">
+                    {{'PLEASE_ENTER_VALID_EMAIL' | translate}}
+                  </div>
+                </div>
+                <div *ngIf="!isEditMode" class="col-md-6">
+                  <label class="form-label">{{'PASSWORD' | translate}}</label>
+                  <input autocomplete="new-password" formControlName="password" class="form-control" type="password">
+                  <div class="text-danger"
+                    *ngIf="userForm.get('password').touched && userForm.get('password').hasError('required')">
+                    {{'PASSWORD_IS_REQUIRED' | translate}}
+                  </div>
+                  <div class="text-danger"
+                    *ngIf="userForm.get('password').touched && userForm.get('password')?.hasError('minlength')">
+                    {{'YOU_HAVE_TO_ENTER_AT_LEAST_DIGIT' | translate}}
+                  </div>
+                </div>
+                <div *ngIf="!isEditMode" class="col-md-6">
+                  <label class="form-label">{{'CONFIRM_PASSWORD' | translate}}</label>
+                  <input autocomplete="new-password" formControlName="confirmPassword" class="form-control"
+                    type="password">
+                  <div class="text-danger"
+                    *ngIf="userForm.get('confirmPassword').touched && userForm.get('confirmPassword').hasError('required')">
+                    {{'CONFIRM_PASSWORD_IS_REQUIRED' | translate}}
+                  </div>
+                  <div class="text-danger"
+                    *ngIf="userForm.get('confirmPassword').touched && userForm.get('confirmPassword').touched && userForm.hasError('notSame')">
+                    {{'PASSWORDS_DO_NOT_MATCH' | translate}}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{'ROLES' | translate}}</label>
+                  <ng-select [multiple]="true" formControlName="selectedRoles">
+                    <ng-option *ngFor="let role of roleList" [value]="role">{{role.name}}</ng-option>
+                  </ng-select>
+                </div>
+                <div class="m-t-10 col-md-12">
+                  <ng-container *ngIf="isEditMode">
+                    <button *hasClaim="'USER_EDIT_USER'" class="btn btn-success btn-sm m-r-10" (click)="saveUser()"
+                      cdkFocusInitial>
+                      <i-feather name="save" class="small-icon"></i-feather>
+                      {{'SAVE' | translate}}</button>
+                  </ng-container>
+                  <ng-container *ngIf="!isEditMode">
+                    <button *hasClaim="'USER_CREATE_USER'" class="btn btn-success btn-sm m-r-10" (click)="saveUser()"
+                      cdkFocusInitial>
+                      <i-feather name="save" class="small-icon"></i-feather>
+                      {{'SAVE' | translate}}</button>
+                  </ng-container>
+                  <button type="button" class="btn btn-danger btn-sm" [routerLink]="['/users']">
+                    <i-feather name="x-circle" class="small-icon"></i-feather>
+                    {{'CANCEL' | translate}}</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

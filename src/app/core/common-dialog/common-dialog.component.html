@@ -1,0 +1,19 @@
+<div class="d-flex">
+  <h5 mat-dialog-title class="confirm-dialog-title text-danger">
+    {{primaryMessage}}
+  </h5>
+  <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content class="confirm-dialog-content" *ngIf="secondaryMessage">
+  <span class="confirm-title-text">{{secondaryMessage}}</span>
+</mat-dialog-content>
+<div mat-dialog-actions>
+  <button class="btn btn-success btn-sm m-r-10" (click)="clickHandler(true)">
+    <i-feather name="check" class="small-icon"></i-feather>
+    {{'YES' | translate}}</button>
+  <button class="btn btn-danger btn-sm" (click)="clickHandler(false)">
+    <i-feather name="x-circle" class="small-icon"></i-feather>
+    {{'CANCEL' | translate}}</button>
+</div>

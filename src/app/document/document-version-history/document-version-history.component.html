@@ -1,0 +1,39 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title">
+    {{data.name }}'s {{'VERSION_HISTORY' | translate}}
+    <app-page-help-text [code]="'VERSION_HISTORY'"></app-page-help-text>
+  </span>
+  <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<div mat-dialog-content>
+  <table class="table">
+    <tbody>
+      <tr *ngFor="let version of data.documentVersions">
+        <td>{{version.modifiedDate | utcToLocalTime:'short'}}</td>
+        <td>
+          {{'ADDED_BY ' | translate}} {{version.createdByUser}}
+        </td>
+        <td>
+          <span *ngIf="version.isCurrentVersion" class="badge bg-success"
+            style="margin-bottom: 10px">{{'CURRENT_VERSION' | translate}}</span>
+          <div *ngIf="!version.isCurrentVersion">
+            <span (click)="onDocumentView(version)" class="material-icons-outlined m-r-5 text-primary" matTooltip="view"
+              role="button">
+              <mat-icon> visibility</mat-icon>
+            </span>
+            <span (click)="downloadDocument(version)" *ngIf="isDownloadFlag" role="button" class="m-r-5 text-primary">
+              <mat-icon> download</mat-icon>
+            </span>
+            <span (click)="restoreDocumentVersion(version)" role="button"
+              *hasClaim="['ALL_DOCUMENTS_RESTORE_VERSION','ASSIGNED_DOCUMENTS_RESTORE_VERSION']"
+              matTooltip="Restore to Current Version" class="material-icons-outlined text-primary">
+              <mat-icon> restore</mat-icon>
+            </span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

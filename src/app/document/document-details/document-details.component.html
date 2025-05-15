@@ -1,0 +1,110 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <span class="mb-0 page-title">{{'DOCUMENT_DETAILS' | translate}} :
+                    <span class="ps-2 text-primary">{{documentInfo.name}}</span>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="row">
+                    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedTabChange)="onTabChange($event)">
+                        <mat-tab class="nav-tabs" label="{{'GENERAL' | translate}}">
+                            <div class="card tab-card">
+                                <div class="body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="fw-bold">{{'CATEGORY' | translate }} :</label>
+                                            <p>{{documentInfo.categoryName}}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="fw-bold">{{'STORAGE' | translate }} :</label>
+                                            <p>{{documentInfo.location }}</p>
+                                        </div>
+                                        <div class="col-md-3" *ngIf="documentInfo.statusName">
+                                            <label class="fw-bold">{{ 'STATUS' | translate }} :</label>
+                                            <p>{{documentInfo.statusName}}</p>
+                                        </div>
+                                        <div class="col-md-3" *ngIf="documentInfo.companyName">
+                                            <label class="fw-bold">{{'CLIENT' | translate }} :</label>
+                                            <p>{{documentInfo.companyName}}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="fw-bold">{{'LAST_MODIFIED_BY' | translate }} :</label>
+                                            <p> {{documentInfo.updatedByName}}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="fw-bold">{{'LAST_MODIFIED_DATE' | translate }} :</label>
+                                            <p> {{documentInfo.modifiedDate | utcToLocalTime:'short'}}</p>
+                                        </div>
+                                        <div class="col-md-3" *ngIf="mataTags.length > 0">
+                                            <label class="fw-bold">{{'META_TAGS' | translate }} :</label> <br>
+                                            <span *ngFor="let tags of mataTags; let i=index"> {{i+ 1}}.{{tags.metatag}}
+                                                <br>
+                                            </span>
+                                        </div>
+                                        <div class="col-md-12" *ngIf="documentInfo.description">
+                                            <label class="fw-bold">{{'DESCRIPTION' | translate }} :</label>
+                                            <span><textarea [disabled]="true"
+                                                    class="form-control-plaintext">{{documentInfo.description}}</textarea></span>
+                                        </div>
+                                        <div class="col-md-3 mt-0 mb-0"
+                                            *hasClaim="['ALL_DOCUMENTS_EDIT_DOCUMENT','ASSIGNED_DOCUMENTS_EDIT_DOCUMENT']">
+                                            <button (click)="editDocument()" class="btn btn-success btn-sm"
+                                                type="button">
+                                                <i-feather name="edit" class="small-icon"></i-feather>
+                                                <span class="d-none d-sm-inline"> {{'EDIT' | translate}}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab class="nav-tabs" label="{{'PERMISSION' | translate}}">
+                            <div class="card tab-card">
+                                <div class="body">
+                                    <app-document-permissions [shouldLoad]="loadedTabs[1]" [documentId]="documentInfo.id"></app-document-permissions>
+                                </div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab class="nav-tabs" label="{{'VERSION_HISTORY' | translate}}">
+                            <div class="card tab-card">
+                                <div class="body">
+                                    <app-document-versions [shouldLoad]="loadedTabs[2]" [data]="documentInfo"
+                                        [documentId]="documentInfo.id"></app-document-versions>
+                                </div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab class="nav-tabs" label="{{'COMMENT' | translate}}">
+                            <div class="card tab-card">
+                                <div class="body">
+                                    <app-document-comments [shouldLoad]="loadedTabs[3]" [documentId]="documentInfo.id"></app-document-comments>
+                                </div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab class="nav-tabs" label="{{'DOCUMENT_AUDIT_TRAIL' | translate}}">
+                            <div class="card tab-card">
+                                <div class="body">
+                                    <app-document-audit-trails [shouldLoad]="loadedTabs[4]"
+                                        [documentId]="documentInfo.id"></app-document-audit-trails>
+                                </div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab class="nav-tabs" label="{{'REMINDERS' | translate}}">
+                            <div class="card tab-card">
+                                <div class="body">
+                                    <app-document-reminders [shouldLoad]="loadedTabs[5]" [documentId]="documentInfo.id"></app-document-reminders>
+                                </div>
+                            </div>
+                        </mat-tab>
+                    </mat-tab-group>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="ms-2 btn btn-danger btn-sm" (click)="onDocumentCancel()">
+        <i-feather name="x-circle" class="small-icon"></i-feather>
+        {{'CANCEL' | translate}}</button>
+</section>

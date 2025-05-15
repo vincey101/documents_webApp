@@ -1,0 +1,60 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row align-items-center">
+          <div class="col">
+              <span class="page-title">{{'ROLES' | translate}}</span>
+              <app-page-help-text [code]="'ROLES'"></app-page-help-text>
+          </div>
+          <div class="col-auto">
+            <ul class="breadcrumb-list">
+              <li class="breadcrumb-item bcrumb-1">
+                <button *hasClaim="'ROLE_CREATE_ROLE'" [routerLink]="['/roles/manage']"
+                  class="btn btn-success btn-sm">
+                  <i-feather name="Plus" class="btn-success small-icon"></i-feather>
+                  <span class="d-none d-sm-inline"> {{'ADD_ROLE' | translate}}</span>
+              </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="body table-responsive">
+            <div class="grid-height-large">
+              <table mat-table [dataSource]="roles" class="w-100">
+                <ng-container matColumnDef="action">
+                  <th style="width:30%" mat-header-cell *matHeaderCellDef>{{'ACTION' | translate}} </th>
+                  <td style="width:30%" mat-cell *matCellDef="let role">
+                    <button *hasClaim="'ROLE_EDIT_ROLE'" [routerLink]="['/roles/manage',role.id]"
+                      class="btn btn-success btn-sm m-r-10" type="button">
+                      <i-feather name="edit" class="small-icon"></i-feather>
+                      <span class="d-none d-sm-inline"> {{'EDIT' | translate}} </span>
+                    </button>
+                    <button *hasClaim="'ROLE_DELETE_ROLE'" (click)="deleteRole(role)" class="btn btn-danger btn-sm"
+                      type="button">
+                      <i-feather name="trash" class="small-icon"></i-feather>
+                      <span class="d-none d-sm-inline"> {{'DELETE' | translate}} </span>
+                    </button>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef> {{'NAME' | translate}} </th>
+                  <td mat-cell *matCellDef="let role"> {{role.name}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

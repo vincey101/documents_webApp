@@ -1,0 +1,947 @@
+﻿@import "variables.scss";
+
+body {
+  background-color: #f1f2f7;
+}
+
+body {
+  @include transition(all 0.5s);
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+}
+
+html {
+  height: 100%;
+}
+
+ul li {
+  list-style-type: none;
+}
+button,
+input,
+select,
+a {
+  outline: none !important;
+  font-size: 14px !important;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+.mat-mdc-select-placeholder {
+  outline: none !important;
+  font-size: $font-size !important;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.mat-mdc-mini-fab {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.mat-mdc-option {
+  font-size: $font-size !important;
+}
+
+.mat-mdc-select-value {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: $font-size;
+}
+
+textarea {
+  font-size: 13px !important;
+}
+
+img {
+  max-width: 100%;
+}
+
+.row {
+  margin-bottom: 0px !important;
+}
+
+ol,
+ul,
+dl {
+  padding-left: 0px;
+  list-style-type: none;
+}
+
+section {
+  &.content {
+    margin: 70px 15px 0 276px;
+    min-height: calc(100vh - 76px);
+    @include transition(0.5s);
+
+    .content-block {
+      padding: 0px 10px 0px 15px;
+    }
+  }
+}
+
+.horizontal-layout {
+  section {
+    &.content {
+      margin: 170px 15px 0 15px;
+      float: left;
+      width: calc(100% - 30px);
+    }
+  }
+}
+
+.pull-left {
+  float: left !important;
+}
+
+.pull-right {
+  float: right !important;
+}
+
+table {
+  .checkbox {
+    [type="checkbox"] + label {
+      margin: 0;
+      height: 20px;
+      padding-left: 20px;
+      vertical-align: middle;
+    }
+  }
+}
+
+.horizontal-layout {
+  .sidebar,
+  .nav-left-menu {
+    display: none;
+  }
+}
+
+.bootstrap-notify-container {
+  max-width: 320px;
+  text-align: center;
+}
+
+.map iframe {
+  width: 100%;
+}
+
+.jqvmap-label {
+  position: absolute;
+  display: none;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  background: #eee;
+  color: black;
+  font-size: 14px;
+  font-family: sans-serif, Verdana;
+  padding: 10px;
+  pointer-events: none;
+}
+
+.navbar-toggle,
+.bars:before,
+.bars:after {
+  color: #fff !important;
+}
+
+.logo-black {
+  .navbar-toggle,
+  .bars:before,
+  .bars:after {
+    color: #fff !important;
+  }
+}
+
+.dark {
+  .sidemenu-collapse i {
+    color: #fff;
+  }
+
+  .nav {
+    > li {
+      > a {
+        color: #fff;
+      }
+    }
+  }
+}
+
+.sidemenu-collapse i {
+  color: #0d091d;
+}
+
+.nav {
+  > li {
+    > a {
+      color: #0d091d;
+    }
+  }
+}
+
+.border-apply {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+input::-webkit-input-placeholder {
+  font-size: $font-size;
+  color: #adabab;
+}
+
+input:-moz-placeholder {
+  /* Firefox 18- */
+  font-size: $font-size;
+  color: #adabab;
+}
+
+input::-moz-placeholder {
+  /* Firefox 19+ */
+  font-size: $font-size;
+  color: #adabab;
+}
+
+input:-ms-input-placeholder {
+  font-size: $font-size;
+  color: #adabab;
+}
+
+textarea::-webkit-input-placeholder {
+  font-size: $font-size;
+  color: #adabab;
+}
+
+textarea:-moz-placeholder {
+  /* Firefox 18- */
+  font-size: $font-size;
+  color: #adabab;
+}
+
+textarea::-moz-placeholder {
+  /* Firefox 19+ */
+  font-size: $font-size;
+  color: #adabab;
+}
+
+textarea:-ms-input-placeholder {
+  font-size: $font-size;
+  color: #adabab;
+}
+
+@media screen and (max-width: 1169px) {
+  .horizontal-layout {
+    .sidebar {
+      display: block;
+    }
+
+    .top-sidebar {
+      display: none;
+    }
+
+    section.content {
+      margin-top: 100px;
+    }
+  }
+}
+
+.font-icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  transition: all 0.2s;
+
+  .icon-preview {
+    font-size: 1.8rem;
+    margin-right: 10px;
+    line-height: 1;
+    color: #333439;
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .boxed-layout .container {
+    width: 1370px;
+    max-width: 100%;
+  }
+}
+
+.breadcrumb-title {
+  background-color: transparent;
+  font-size: 15px;
+  align-items: center;
+  margin: 30px 0px;
+  padding: 0px;
+  color: #555;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #444444;
+
+  i {
+    padding: 0px 5px;
+
+    &:before {
+      color: #717883;
+      font-size: 20px;
+    }
+  }
+}
+
+.mat-mdc-header-row {
+  background-color: #f5f5f5 !important;
+}
+
+.file-preview-overlay-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.cdk-overlay-pane {
+  display: block !important;
+}
+
+.mat-mdc-paginator {
+  background-color: #f5f5f5 !important;
+}
+
+.mat-mdc-footer-row {
+  background-color: #f5f5f5 !important;
+}
+
+.small-icon {
+  height: 15px !important;
+  width: 15px !important;
+}
+
+.medium-icon {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+.dialog-title {
+  font-size: 20px !important;
+  font-weight: 500 !important;
+  color: #444444 !important;
+}
+
+.calendar-button {
+  border-radius: 0rem 0.2rem 0.2rem 0rem !important;
+}
+
+.white-background {
+  background-color: #fff !important;
+}
+
+.doc-link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer !important;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.timepicker-overlay {
+  z-index: 9999 !important;
+}
+
+.timepicker-backdrop-overlay {
+  z-index: 9999 !important;
+}
+
+.timepicker__header {
+  background-color: map-get($colors, "indigo") !important;
+}
+
+.timepicker-button {
+  color: map-get($colors, "indigo") !important;
+}
+
+.clock-face__number > span.active {
+  background-color: map-get($colors, "indigo") !important;
+}
+
+.clock-face__clock-hand {
+  background-color: map-get($colors, "indigo") !important;
+}
+
+.mat-pseudo-checkbox-full.mat-pseudo-checkbox-checked {
+  background-color: #3f51b5 !important;
+}
+
+.pdf-viewer-height {
+  height: calc(100vh - 65px);
+}
+
+.grid-height-small {
+  max-height: calc(100vh - 275px) !important;
+  overflow-y: auto;
+
+  .mat-mdc-header-row {
+    height: 41px;
+  }
+
+  .mat-mdc-footer-row {
+    height: 40px;
+  }
+
+  .mat-mdc-row {
+    height: 40px;
+  }
+
+  .mat-mdc-icon-button {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+  }
+
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+    /* Ensure the width matches the height */
+    display: flex;
+    align-items: center;
+    /* Center icon vertically */
+    justify-content: center;
+    padding: 0px;
+    /* Center icon horizontally */
+  }
+
+  /* Adjust the overall height of the mat-paginator */
+  .mat-mdc-paginator {
+    height: 30px;
+    /* Set the desired height */
+    display: flex;
+    align-items: center;
+    /* Center text vertically */
+
+    .mat-mdc-paginator-range-actions,
+    .mat-mdc-paginator-page-size {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-page-size-select {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-touch-target {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 30px;
+    }
+
+    .mdc-text-field--outlined .mat-mdc-form-field-infix,
+    .mdc-text-field--no-label .mat-mdc-form-field-infix {
+      padding: 3px !important;
+    }
+  }
+}
+
+.grid-height-medium {
+  max-height: calc(100vh - 300px) !important;
+  overflow-y: auto;
+
+  .mat-mdc-header-row {
+    height: 41px;
+  }
+
+  .mat-mdc-footer-row {
+    height: 40px;
+  }
+
+  .mat-mdc-row {
+    height: 40px;
+  }
+
+  .mat-mdc-icon-button {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+  }
+
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+    /* Ensure the width matches the height */
+    display: flex;
+    align-items: center;
+    /* Center icon vertically */
+    justify-content: center;
+    padding: 0px;
+    /* Center icon horizontally */
+  }
+
+  /* Adjust the overall height of the mat-paginator */
+  .mat-mdc-paginator {
+    height: 30px;
+    /* Set the desired height */
+    display: flex;
+    align-items: center;
+    /* Center text vertically */
+
+    .mat-mdc-paginator-range-actions,
+    .mat-mdc-paginator-page-size {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-page-size-select {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-touch-target {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 30px;
+    }
+
+    .mdc-text-field--outlined .mat-mdc-form-field-infix,
+    .mdc-text-field--no-label .mat-mdc-form-field-infix {
+      padding: 3px !important;
+    }
+  }
+}
+
+.grid-height-large {
+  max-height: calc(100vh - 151px) !important;
+  overflow-y: auto;
+
+  .mat-mdc-header-row {
+    height: 41px;
+  }
+
+  .mat-mdc-footer-row {
+    height: 40px;
+  }
+
+  .mat-mdc-row {
+    height: 40px;
+  }
+
+  .mat-mdc-icon-button {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+  }
+
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+    /* Ensure the width matches the height */
+    display: flex;
+    align-items: center;
+    /* Center icon vertically */
+    justify-content: center;
+    padding: 0px;
+    /* Center icon horizontally */
+  }
+
+  /* Adjust the overall height of the mat-paginator */
+  .mat-mdc-paginator {
+    height: 30px;
+    /* Set the desired height */
+    display: flex;
+    align-items: center;
+    /* Center text vertically */
+
+    .mat-mdc-paginator-range-actions,
+    .mat-mdc-paginator-page-size {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-page-size-select {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-touch-target {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 30px;
+    }
+
+    .mdc-text-field--outlined .mat-mdc-form-field-infix,
+    .mdc-text-field--no-label .mat-mdc-form-field-infix {
+      padding: 3px !important;
+    }
+  }
+}
+
+.grid-height-permission {
+  max-height: 300px !important;
+  overflow-y: auto;
+
+  .mat-mdc-header-row {
+    height: 41px;
+  }
+
+  .mat-mdc-footer-row {
+    height: 40px;
+  }
+
+  .mat-mdc-row {
+    height: 40px;
+  }
+
+  .mat-mdc-icon-button {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+  }
+
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+    /* Ensure the width matches the height */
+    display: flex;
+    align-items: center;
+    /* Center icon vertically */
+    justify-content: center;
+    padding: 0px;
+    /* Center icon horizontally */
+  }
+
+  /* Adjust the overall height of the mat-paginator */
+  .mat-mdc-paginator {
+    height: 30px;
+    /* Set the desired height */
+    display: flex;
+    align-items: center;
+    /* Center text vertically */
+
+    .mat-mdc-paginator-range-actions,
+    .mat-mdc-paginator-page-size {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-page-size-select {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-touch-target {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 30px;
+    }
+
+    .mdc-text-field--outlined .mat-mdc-form-field-infix,
+    .mdc-text-field--no-label .mat-mdc-form-field-infix {
+      padding: 3px !important;
+    }
+  }
+}
+
+.grid-height-reminder {
+  max-height: 450px !important;
+  overflow-y: auto;
+
+  .mat-mdc-header-row {
+    height: 41px;
+  }
+
+  .mat-mdc-footer-row {
+    height: 40px;
+  }
+
+  .mat-mdc-row {
+    height: 40px;
+  }
+
+  .mat-mdc-icon-button {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+  }
+
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    height: 24px !important;
+    /* Decrease the height */
+    width: 24px !important;
+    /* Ensure the width matches the height */
+    display: flex;
+    align-items: center;
+    /* Center icon vertically */
+    justify-content: center;
+    padding: 0px;
+    /* Center icon horizontally */
+  }
+
+  /* Adjust the overall height of the mat-paginator */
+  .mat-mdc-paginator {
+    height: 30px;
+    /* Set the desired height */
+    display: flex;
+    align-items: center;
+    /* Center text vertically */
+
+    .mat-mdc-paginator-range-actions,
+    .mat-mdc-paginator-page-size {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-page-size-select {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-paginator-touch-target {
+      height: 30px;
+      /* Set the desired height */
+      display: flex;
+      align-items: center;
+      /* Center text vertically */
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 30px;
+    }
+
+    .mdc-text-field--outlined .mat-mdc-form-field-infix,
+    .mdc-text-field--no-label .mat-mdc-form-field-infix {
+      padding: 3px !important;
+    }
+  }
+}
+
+.spinner-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  width: auto;
+  height: 45px;
+}
+
+.user_profile {
+  padding-top: 5px;
+}
+
+@for $index from 0 through 1000 {
+  $size: $index * 2;
+
+  .table-column-#{$size} {
+    // flex: 0 1 #{$size}#{"px"};
+    min-width: #{$size}#{"px"};
+    // padding-left: 1rem !important;
+    // padding-right: 1rem !important;
+  }
+}
+
+@for $index from 0 through 1000 {
+  $size: $index * 2;
+
+  .table-column-fix-#{$size} {
+    width: #{$size}#{"px"};
+  }
+}
+
+.mat-select-control {
+  margin-left: -13px !important;
+  margin-top: 8px !important;
+
+  .mat-mdc-option {
+    min-height: 40px;
+  }
+}
+
+.mat-mdc-menu-item {
+  min-height: 38px !important;
+}
+
+.alt-bg .wrap:nth-child(odd) {
+  background-color: #f9f9f9;
+  border-top: 1px solid #cacaca;
+  border-left: 1px solid #cacaca;
+  border-right: 1px solid #cacaca;
+}
+
+.alt-bg .wrap:nth-child(even) {
+  background-color: #fff;
+  border-top: 1px solid #cacaca;
+  border-left: 1px solid #cacaca;
+  border-right: 1px solid #cacaca;
+}
+
+.mat-mdc-menu-content,
+.mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-text {
+  font-size: 15px !important;
+}
+
+.mat-mdc-menu-content .material-icons {
+  font-size: 20px !important;
+}
+.mat-expansion-panel:not([class*="mat-elevation-z"]) {
+  box-shadow: none !important;
+  background-color: #f5f5f5;
+}
+
+.ng-scrollbar-thumb {
+  background-color: rgb(103 119 239) !important;
+}
+
+.ng-scrollbar-track {
+  background-color: #acacac !important;
+}
+@media (min-width: 320px) and (max-width: 480px) {
+  .mat-expansion-panel-body {
+    padding: 0 4px 16px !important;
+  }
+  .folder_shared {
+    width: 20px !important;
+  }
+  .mat-mdc-header-cell,
+  .mat-sort-header-content {
+    white-space: nowrap !important;
+  }
+  .mat-mdc-cell {
+    white-space: nowrap !important;
+  }
+  .page-title {
+    font-size: 16px;
+  }
+}
+
+.mat-mdc-menu-item {
+  min-height: 38px !important;
+}
+
+.alt-bg .wrap:nth-child(odd) {
+  background-color: #f9f9f9;
+  border-top: 1px solid #cacaca;
+  border-left: 1px solid #cacaca;
+  border-right: 1px solid #cacaca;
+}
+
+.alt-bg .wrap:nth-child(even) {
+  background-color: #fff;
+  border-top: 1px solid #cacaca;
+  border-left: 1px solid #cacaca;
+  border-right: 1px solid #cacaca;
+}
+
+.mat-mdc-menu-content,
+.mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-text {
+  font-size: 15px !important;
+}
+
+.mat-mdc-menu-content .material-icons {
+  font-size: 20px !important;
+}
+.mat-expansion-panel:not([class*="mat-elevation-z"]) {
+  box-shadow: none !important;
+  background-color: #f5f5f5;
+}
+
+.ng-scrollbar-thumb {
+  background-color: rgb(103 119 239) !important;
+}
+
+.ng-scrollbar-track {
+  background-color: #acacac !important;
+}
+@media (min-width: 320px) and (max-width: 480px) {
+  .mat-expansion-panel-body {
+    padding: 0 4px 16px !important;
+  }
+}
+.w-18 {
+  width: 18px !important;
+}
+.h-18 {
+  height: 18px !important;
+}
+.block-header {
+  margin-bottom: 10px;
+  .breadcrumb-list {
+    margin-bottom: 0;
+  }
+}

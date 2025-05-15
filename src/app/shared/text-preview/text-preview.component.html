@@ -1,0 +1,8 @@
+<div class="m-5 text-main-div">
+    <ng-container *ngFor="let line of textLines">
+        <pre *ngIf="line">{{line}}</pre>
+        <div *ngIf="!line">
+            <br />
+        </div>
+    </ng-container>
+</div>

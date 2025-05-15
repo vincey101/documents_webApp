@@ -1,0 +1,55 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">
+          {{ "ALLOW_FILE_EXTENSIONS" | translate }}
+          <app-page-help-text code="MANAGE_ALLOW_FILE_EXTENSION"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table mat-table [dataSource]="allowFileExtensions">
+              <ng-container matColumnDef="action">
+                <th class="table-column-fix-188" mat-header-cell *matHeaderCellDef>{{'ACTION' |
+                  translate}} </th>
+                <td mat-cell *matCellDef="let allowFileExtension">
+                  <button [routerLink]="['/allow-file-extension/manage', allowFileExtension.id]"
+                    class="btn btn-success btn-sm me-2" routerLinkActive="active">
+                    <i-feather name="edit" class="small-icon"></i-feather>
+                    <span class="d-none d-sm-inline"> {{'EDIT' | translate}}</span>
+                  </button>
+                  <button (click)="deleteAllowFileExtension(allowFileExtension)" class="btn btn-danger btn-sm"
+                    type="button">
+                    <i-feather name="trash" class="small-icon"></i-feather>
+                    <span class="d-none d-sm-inline"> {{'DELETE' | translate}}</span>
+                  </button>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>{{ 'TYPE' | translate }}</th>
+                <td mat-cell *matCellDef="let allowFileExtension">{{ allowFileExtension.fileType | fileType }}</td>
+              </ng-container>
+              <ng-container matColumnDef="extensions">
+                <th mat-header-cell *matHeaderCellDef>{{ 'EXTENSIONS' | translate }}</th>
+                <td mat-cell *matCellDef="let allowFileExtension">{{ allowFileExtension.extensions }}</td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="5">
+                  <div class="m-2">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </div>
+                </td>
+              </tr>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

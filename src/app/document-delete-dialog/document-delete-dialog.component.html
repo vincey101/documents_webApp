@@ -1,0 +1,27 @@
+<div class="d-flex">
+    <h2 mat-dialog-title class="confirm-dialog-title text-danger">
+        {{'ARE_YOU_SURE_YOU_WANT_TO_DELETE' | translate}}?
+    </h2>
+    <button mat-icon-button class="close-button ms-auto" (click)="clickHandler(false)">
+        <mat-icon class="close-icon" color="warn">close</mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="confirm-dialog-content">
+    <div class="text-danger m-l-10">{{'DELETE_DOCUMENT_WARNING' | translate}}</div>
+    <div class="m-l-25 m-t-15">
+        <li>{{'VERSION_HISTORY' | translate}}</li>
+        <li>{{'META_TAGS' | translate}}</li>
+        <li>{{'COMMENT' | translate}}</li>
+        <li>{{'NOTIFICATIONS' | translate}}</li>
+        <li>{{'REMINDERS' | translate}}</li>
+        <li>{{'PERMISSIONS' | translate}}</li>
+    </div>
+</mat-dialog-content>
+<div mat-dialog-actions class="m-l-10">
+    <button class="btn btn-success btn-sm m-r-10" (click)="clickHandler(true)">
+        <i-feather name="check" class="small-icon"></i-feather>
+        {{'YES' | translate}}</button>
+    <button class="btn btn-danger btn-sm" (click)="clickHandler(false)">
+        <i-feather name="x-circle" class="small-icon"></i-feather>
+        {{'CANCEL' | translate}}</button>
+</div>

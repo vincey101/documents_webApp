@@ -1,0 +1,93 @@
+<section class="content">
+    <div class="content-block">
+        <div class="block-header">
+            <div class="breadcrumb-main">
+                <div class="row align-items-center">
+                    <div class="col">
+                            <span class="page-title">{{ "LANGUAGES" | translate }}
+                                <app-page-help-text code="LANGUAGES"></app-page-help-text>
+                            </span>
+                    </div>
+                    <div class="col-auto">
+                        <ul class="breadcrumb-list">
+                            <li class="breadcrumb-item bcrumb-1">
+                                <button [routerLink]="['/languages/manage/addItem']" class="btn btn-success btn-sm">
+                                    <i-feather name="Plus" class="btn-success small-icon"></i-feather>
+                                    <span class="d-none d-sm-inline"> {{'ADD_LANGUAGE' | translate}}</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="body">
+                        <div class="table-responsive">
+                            <div class="grid-height-large">
+                                <table mat-table [dataSource]="languages">
+                                    <ng-container matColumnDef="action">
+                                        <th class="table-column-100" mat-header-cell *matHeaderCellDef> {{"ACTION" |
+                                            translate}} </th>
+                                        <td class="table-column-100" mat-cell *matCellDef="let element">
+                                            <button [routerLink]="['/languages/manage',element.id]"
+                                                class="btn btn-success btn-sm m-r-5" type="button">
+                                                <i-feather name="edit" class="small-icon"></i-feather>
+                                                <span class="d-none d-sm-inline"> {{"EDIT" | translate}}</span>
+                                            </button>
+                                            <button (click)="deleteLanguage(element)" class="btn btn-danger btn-sm"
+                                                type="button">
+                                                <i-feather name="trash" class="small-icon"></i-feather>
+                                                <span class="d-none d-sm-inline"> {{"DELETE" | translate}}</span>
+                                            </button>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="imageUrl">
+                                        <th mat-header-cell *matHeaderCellDef> {{"IMAGE" | translate}} </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <ng-container *ngIf="element.imageUrl; else noImage">
+                                                <img class="img-thumbnail product-thumbnail my-2"
+                                                    [src]="element.imageUrl" alt="{{'IMAGE' | translate}}">
+                                            </ng-container>
+                                            <ng-template #noImage>
+                                                <img class="img-thumbnail product-thumbnail my-2"
+                                                    src="assets/images/no-preview.jpg" alt="{{'IMAGE' | translate}}">
+                                            </ng-template>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="name">
+                                        <th mat-header-cell *matHeaderCellDef> {{"NAME" | translate}} </th>
+                                        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="code">
+                                        <th mat-header-cell *matHeaderCellDef> {{"CODE" | translate}} </th>
+                                        <td mat-cell *matCellDef="let element"> {{element.code}} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="order">
+                                        <th mat-header-cell *matHeaderCellDef> {{"ORDER" | translate}} </th>
+                                        <td mat-cell *matCellDef="let element"> {{element.order}} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="isRTL">
+                                        <th mat-header-cell *matHeaderCellDef> {{"IS_RTL" | translate}} </th>
+                                        <td mat-cell *matCellDef="let emailSMTPSetting">
+                                            <ng-container *ngIf="emailSMTPSetting.isRTL">{{'YES' |
+                                                translate}}</ng-container>
+                                            <ng-container *ngIf="!emailSMTPSetting.isRTL">{{'NO' |
+                                                translate}}</ng-container>
+                                        </td>
+
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

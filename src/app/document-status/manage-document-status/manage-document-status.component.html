@@ -1,0 +1,42 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title">{{'DOCUMENT_STATUS' | translate}}<app-page-help-text
+      [code]="'DOCUMENT_STATUS'"></app-page-help-text></span>
+  <button mat-icon-button class="ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content>
+  <form [formGroup]="documentStatusForm" class="form-group">
+    <div class="mb-3">
+      <label for="name" class="form-label">{{'NAME'| translate}}</label>
+      <input type="text" class="form-control" id="name" formControlName="name" />
+      <div *ngIf="documentStatusForm.get('name').hasError('required') && documentStatusForm.get('name').touched"
+        class="text-danger">
+        {{ 'NAME_IS_REQUIRED' | translate }}
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">{{'DESCRIPTION' | translate}}</label>
+      <input type="text" class="form-control" id="description" formControlName="description" />
+      <div *ngIf="
+            documentStatusForm.get('description').hasError('required') &&
+            documentStatusForm.get('description').touched
+          " class="text-danger">
+        {{ 'DESCRIPTION_IS_REQUIRED' | translate }}
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">{{'COLOR_CODE' | translate}}</label>
+      <input type="text" [(colorPicker)]="colorCode" [style.background]="colorCode" class="form-control"
+        id="description" readonly />
+    </div>
+    <div class="mt-3">
+      <button type="submit" class="btn btn-success btn-sm" (click)="saveDocumentStatus()">
+        <i-feather name="save" class="small-icon"></i-feather> {{ isEditMode ? 'UPDATE' : 'SAVE' | translate }}
+      </button>
+      <button type="button" class="btn btn-danger btn-sm ms-1" (click)="closeDialog()">
+        <i-feather name="x-circle" class="small-icon"></i-feather> {{ 'CANCEL' | translate }}
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>

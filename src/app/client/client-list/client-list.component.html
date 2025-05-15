@@ -1,0 +1,73 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col mb-2">
+        <span class="mb-0 page-title">
+          {{ "CLIENTS" | translate }}
+          <app-page-help-text code="CLIENTS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="col-auto d-flex justify-content-end mb-2">
+        <button class="btn btn-primary btn-sm me-2" (click)="refresh()">
+          <i-feather name="refresh-cw" class="small-icon me-1"></i-feather>
+          <span>{{ "REFRESH" | translate }}</span>
+        </button>
+        <button [routerLink]="['/client/manage']" class="btn btn-success btn-sm me-2">
+          <i-feather name="plus" class="small-icon"></i-feather>
+          
+          <span class="d-none d-sm-inline">{{'ADD_CLIENT' | translate}}</span>
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table mat-table [dataSource]="clientStore.clients()">
+              <ng-container matColumnDef="action">
+                <th class="table-column-fix-188" mat-header-cell *matHeaderCellDef>{{'ACTION' |
+                  translate}} </th>
+                <td mat-cell *matCellDef="let client">
+                  <button [routerLink]="['/client/manage', client.id]" class="btn btn-success btn-sm me-2"
+                    routerLinkActive="active">
+                    <i-feather name="edit" class="small-icon"></i-feather>
+                    <span class="d-none d-sm-inline"> {{'EDIT' | translate}}</span>
+                  </button>
+                  <button (click)="deleteClient(client)" class="btn btn-danger btn-sm" type="button">
+                    <i-feather name="trash" class="small-icon"></i-feather>
+                    <span class="d-none d-sm-inline"> {{'DELETE' | translate}}</span>
+                  </button>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="companyName">
+                <th mat-header-cell *matHeaderCellDef>{{ 'COMPANY_PERSON_NAME' | translate }}</th>
+                <td mat-cell *matCellDef="let client">{{ client.companyName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="contactPerson">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'CONTACT_PERSON' | translate}} </th>
+                <td mat-cell *matCellDef="let client"> {{client.contactPerson}} </td>
+              </ng-container>
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'EMAIL' | translate}} </th>
+                <td mat-cell *matCellDef="let client"> {{client.email}} </td>
+              </ng-container>
+              <ng-container matColumnDef="phoneNumber">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'MOBILE_NUMBER' | translate}} </th>
+                <td mat-cell *matCellDef="let client"> {{client.phoneNumber}} </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="6">
+                  <div class="m-2">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </div>
+                </td>
+              </tr>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

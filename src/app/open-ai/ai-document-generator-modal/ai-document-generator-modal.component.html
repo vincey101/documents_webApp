@@ -1,0 +1,19 @@
+<div class="d-flex">
+    <h2 mat-dialog-title class="dialog-title">  {{ "AI_DOCUMENTS" | translate }}
+    </h2>
+    <button mat-icon-button class="ms-auto" (click)="onCancel()">
+      <mat-icon class="close-icon" color="warn">close</mat-icon>
+    </button>
+  </div>
+  <mat-dialog-content class="pt-0">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card-body">
+          <div class="row">
+            <ckeditor class="ckeditor-class" [editor]="editor"
+               [disabled]="true" [(ngModel)]="parseData"></ckeditor>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>

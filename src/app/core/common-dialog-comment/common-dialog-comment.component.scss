@@ -1,0 +1,45 @@
+// .dialog-header {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+// }
+
+// .close-button {
+//   background: none;
+//   border: none;
+//   font-size: 24px;
+//   /* Adjust size as needed */
+//   cursor: pointer;
+//   color: #555;
+//   /* Change color as needed */
+//   margin-left: auto;
+//   /* Pushes button to the right */
+// }
+
+// .close-button:hover {
+//   color: red;
+//   /* Change color on hover */
+// }
+
+// .w-98 {
+//   width: 98% !important;
+// }
+
+
+.confirm-title-text {
+  color: #666 !important;
+  font-weight: normal !important;
+}
+
+.confirm-dialog-title {
+  padding-left: 0.5rem !important;
+  padding-top: 0rem !important;
+  margin-top: -0.5rem;
+  color: #dc3545 !important;
+}
+
+.confirm-dialog-content {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0.5rem !important;
+}

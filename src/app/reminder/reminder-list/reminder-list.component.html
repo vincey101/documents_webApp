@@ -1,0 +1,143 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <div class="breadcrumb-main">
+        <div class="row align-items-center">
+          <div class="col">
+              <span class="page-title">{{ "REMINDERS" | translate }}
+                <app-page-help-text code="REMINDERS"></app-page-help-text>
+              </span>
+          </div>
+          <div class="col-auto">
+            <ul class="breadcrumb-list">
+              <li class="breadcrumb-item bcrumb-1">
+                <button *hasClaim="'REMINDER_CREATE_REMINDER'" [routerLink]="['/reminders/add']"
+                  class="btn btn-success btn-sm">
+                  <i-feather name="Plus" class="btn-success small-icon"></i-feather>
+                  <span class="d-none d-sm-inline"> {{'ADD_REMINDER' | translate}}</span>
+              </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+
+        <div class="card">
+          <div class="body table-responsive">
+            <div class="grid-height-medium">
+              <table mat-table class="w-100" [dataSource]="dataSource" matSort matSortActive="startDate"
+                matSortDirection="desc" matSortDisableClear>
+                <ng-container matColumnDef="action">
+                  <th mat-header-cell *matHeaderCellDef>
+                  </th>
+                  <td mat-cell *matCellDef="let reminder">
+                    <button *hasClaim="['REMINDER_EDIT_REMINDER','REMINDER_DELETE_REMINDER']" mat-icon-button
+                      [matMenuTriggerFor]="menu" aria-label="Action">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button *hasClaim="'REMINDER_EDIT_REMINDER'" [routerLink]="['/reminders/manage',reminder.id]"
+                        mat-menu-item>
+                        <mat-icon>edit</mat-icon>
+                        <span>{{'EDIT' | translate}}</span>
+                      </button>
+                      <button *hasClaim="'REMINDER_DELETE_REMINDER'" mat-menu-item (click)="deleteReminder(reminder)">
+                        <mat-icon>delete</mat-icon>
+                        <span>{{'DELETE' | translate}}</span>
+                      </button>
+                    </mat-menu>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="startDate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'START_DATE' | translate}} </th>
+                  <td mat-cell *matCellDef="let reminder"> {{reminder.startDate | utcToLocalTime:'short'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="endDate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'END_DATE' | translate}} </th>
+                  <td mat-cell *matCellDef="let reminder"> {{reminder.endDate | utcToLocalTime:'short'}} </td>
+                </ng-container>
+                <ng-container matColumnDef="subject">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'SUBJECT' | translate}} </th>
+                  <td mat-cell *matCellDef="let reminder"> {{reminder.subject | limitTo: '100'}} </td>
+                </ng-container>
+                <ng-container matColumnDef="message">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'MESSAGE' | translate}} </th>
+                  <td mat-cell *matCellDef="let reminder"> {{reminder.message | limitTo: '150'}} </td>
+                </ng-container>
+                <ng-container matColumnDef="frequency">
+                  <th mat-header-cell *matHeaderCellDef> {{'FREQUENCY' | translate}} </th>
+                  <td mat-cell *matCellDef="let reminder"> {{reminder.frequency | frequency | translate}}
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="documentName">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'DOCUMENT' | translate}} </th>
+                  <td mat-cell *matCellDef="let reminder"> {{reminder.documentName }} </td>
+                </ng-container>
+                <ng-container matColumnDef="action-search">
+                  <th mat-header-cell *matHeaderCellDef> </th>
+                </ng-container>
+                <ng-container matColumnDef="date-search">
+                  <th mat-header-cell *matHeaderCellDef> </th>
+                </ng-container>
+                <ng-container matColumnDef="enddate-search">
+                  <th mat-header-cell *matHeaderCellDef> </th>
+                </ng-container>
+                <ng-container matColumnDef="subject-search">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <input placeholder="{{'SUBJECT' | translate}}" type="text" class="form-control w-90"
+                      [(ngModel)]="SubjectFilter">
+                  </th>
+                </ng-container>
+                <ng-container matColumnDef="message-search">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <input placeholder="{{'MESSAGE' | translate}}" type="text" class="form-control w-90 ml-2"
+                      [(ngModel)]="MessageFilter">
+                  </th>
+                </ng-container>
+                <ng-container matColumnDef="frequency-search">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <ng-select placeholder="{{'FREQUENCY' | translate}}" appendTo="body" [(ngModel)]="FrequencyFilter"
+                      class="ml-3 mdc-menu-surface-open">
+                      <ng-option [value]=""> {{'NONE' | translate}}</ng-option>
+                      <ng-option *ngFor="let frequency of reminderFrequencies" [value]="frequency?.id">
+                        {{frequency?.name.toUpperCase() | translate}}
+                      </ng-option>
+                    </ng-select>
+                  </th>
+                </ng-container>
+                <ng-container matColumnDef="document-search">
+                  <th mat-header-cell *matHeaderCellDef> </th>
+                </ng-container>
+                <ng-container matColumnDef="footer">
+                  <td mat-footer-cell colspan="7" *matFooterCellDef>
+                    <mat-paginator [length]="reminderResource.totalCount" [pageSize]="reminderResource.pageSize"
+                      [pageSizeOptions]="[10, 20, 30]">
+                    </mat-paginator>
+                  </td>
+                </ng-container>
+                <tr *matNoDataRow>
+                  <td colspan="7">
+                    <div class="pt-2 pl-2">
+                      <b> {{'NO_DATA_FOUND' | translate}}</b>
+                    </div>
+                  </td>
+                </tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-header-row
+                  *matHeaderRowDef="['action-search','date-search','enddate-search','subject-search', 'message-search','frequency-search','document-search']">
+                </tr>
+                <tr mat-footer-row *matFooterRowDef="footerToDisplayed"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

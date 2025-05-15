@@ -1,0 +1,22 @@
+<div class="d-flex">
+  <h2 mat-dialog-title class="dialog-title">
+    {{ data.name }}
+    <i-feather name="edit" *hasClaim="'PAGE_HELPER_MANAGE_PAGE_HELPER'" class="cursor-pointer text-primary medium-icon ms-1"
+      (click)="editPageHelper()"></i-feather>
+  </h2>
+  <button mat-icon-button class="ms-auto" (click)="onCancel()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content class="pt-0">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card-body">
+        <div class="row">
+          <ckeditor class="ckeditor-class" style="width: 100% !important; border: none !important" [editor]="editor"
+            [config]="config" [disabled]="true" [(ngModel)]="data.description"></ckeditor>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>

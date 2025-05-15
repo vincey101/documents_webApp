@@ -1,0 +1,23 @@
+.mat-mdc-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+  tr.example-detail-row {
+    height: 0 !important;
+}
+
+.example-element-row td {
+    border-bottom-width: 0;
+}
+
+.example-element-detail {
+    overflow: hidden;
+    display : flex;
+}
+
+.inner-table {
+    margin: 1em;
+    padding: 1em;
+    width: 100% !important;
+}

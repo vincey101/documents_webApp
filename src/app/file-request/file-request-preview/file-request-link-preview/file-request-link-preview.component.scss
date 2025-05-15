@@ -1,0 +1,62 @@
+// .content {
+//     padding: 2rem 0;
+//   }
+  
+//   .card {
+//     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+//     border-radius: 8px;
+//   }
+  
+//   .card-header {
+//     font-size: 1.25rem;
+//   }
+  
+//   .password-container {
+//     text-align: center;
+//     margin: 1rem 0;
+//   }
+  
+//   .list-group-item {
+//     font-size: 0.9rem;
+//   }
+  
+//   .text-center {
+//     text-align: center;
+//   }
+  
+//   .btn {
+//     font-size: 0.9rem;
+//   }
+
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .input-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-group .btn-danger {
+    margin-left: 8px;
+  }
+  
+  .btn {
+    font-size: 14px;
+  }
+  
+  .list-group-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  section.content {
+    margin-left: 0 !important;
+  }

@@ -1,0 +1,45 @@
+<div class="row">
+  <div class="grid-height-auto">
+    <table mat-table class="w-100" [dataSource]="dataSource" matSort matSortActive="startDate" matSortDirection="desc"
+      matSortDisableClear>
+      <ng-container matColumnDef="startDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'START_DATE' | translate}} </th>
+        <td mat-cell *matCellDef="let reminder"> {{reminder.startDate | utcToLocalTime:'short'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="endDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'END_DATE' | translate}} </th>
+        <td mat-cell *matCellDef="let reminder"> {{reminder.endDate | utcToLocalTime:'short'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="subject">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'SUBJECT' | translate}} </th>
+        <td mat-cell *matCellDef="let reminder"> {{reminder.subject | limitTo: '100'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="message">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'MESSAGE' | translate}} </th>
+        <td mat-cell *matCellDef="let reminder"> {{reminder.message | limitTo: '150'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="frequency">
+        <th mat-header-cell *matHeaderCellDef> {{'FREQUENCY' | translate}} </th>
+        <td mat-cell *matCellDef="let reminder"> {{reminder.frequency | frequency | translate}}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="footer">
+        <td mat-footer-cell colspan="7" *matFooterCellDef>
+          <mat-paginator [length]="reminderResource.totalCount" [pageSize]="reminderResource.pageSize"
+            [pageSizeOptions]="[10, 20, 30]">
+          </mat-paginator>
+        </td>
+      </ng-container>
+      <tr *matNoDataRow>
+        <td colspan="7">
+          <div class="pt-2 pl-2">
+            <b> {{'NO_DATA_FOUND' | translate}}</b>
+          </div>
+        </td>
+      </tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-footer-row *matFooterRowDef="footerToDisplayed"></tr>
+    </table>
+  </div>
+</div>

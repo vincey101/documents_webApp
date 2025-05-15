@@ -1,0 +1,76 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <!-- Left-hand side: Title -->
+            <div class="col mb-2">
+                <span class="mb-0 page-title">{{'DOCUMENT_STATUS' | translate}}</span>
+                <app-page-help-text [code]="'DOCUMENT_STATUS'"></app-page-help-text>
+            </div>
+            <!-- Right-hand side: Buttons -->
+            <div class="col-auto d-flex justify-content-end mb-2">
+                <button class="btn btn-primary btn-sm me-2" (click)="refresh()">
+                    <i-feather name="refresh-cw" class="small-icon me-1"></i-feather>
+                    <span>{{ "REFRESH" | translate }}</span>
+                </button>
+                <button class="btn btn-success btn-sm" (click)="onCreateDocumentStatus()">
+                    <i-feather name="Plus" class="btn-success small-icon"></i-feather>
+                    <span class="d-none d-sm-inline"> {{ 'ADD_DOCUMENT_STATUS' | translate }}</span>
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="body">
+                <div class="table-responsive">
+                    <div class="grid-height-large">
+                        <table mat-table [dataSource]="documentStatusStore.statusList()">
+                            <ng-container matColumnDef="action">
+                                <th class="table-column-fix-188" mat-header-cell *matHeaderCellDef>{{'ACTION' |
+                                    translate}} </th>
+                                <td mat-cell *matCellDef="let documentStatus">
+                                    <button class="btn btn-success btn-sm me-2" type="button"
+                                        (click)="onEditDocumentStatus(documentStatus)">
+                                        <i-feather name="edit" class="small-icon"></i-feather>
+                                        <span class="d-none d-sm-inline"> {{'EDIT' | translate}}</span>
+                                    </button>
+                                    <button (click)="deleteDocumentStatus(documentStatus.id)"
+                                        class="btn btn-danger btn-sm" type="button">
+                                        <i-feather name="trash" class="small-icon"></i-feather>
+                                        <span class="d-none d-sm-inline"> {{'DELETE' | translate}}</span>
+                                    </button>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="name">
+                                <th mat-header-cell *matHeaderCellDef>{{ 'NAME' | translate }}</th>
+                                <td mat-cell *matCellDef="let documentStatus">{{ documentStatus.name }}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="description">
+                                <th mat-header-cell *matHeaderCellDef>{{ 'DESCRIPTION' | translate }}</th>
+                                <td mat-cell *matCellDef="let documentStatus">{{ documentStatus.description }}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="colorCode">
+                                <th mat-header-cell *matHeaderCellDef>{{ 'COLOR_CODE' | translate }}</th>
+                                <td mat-cell [ngStyle]="{'color': documentStatus?.colorCode}"
+                                    *matCellDef="let documentStatus">{{
+                                    documentStatus.colorCode }}</td>
+                            </ng-container>
+                            <tr *matNoDataRow>
+                                <td colspan="5">
+                                    <div class="m-2">
+                                        <b> {{'NO_DATA_FOUND' | translate}}</b>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="spinner-container" *ngIf="isLoadingResults">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>

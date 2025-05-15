@@ -1,0 +1,19 @@
+::ng-deep .ck-editor__editable_inline {
+  min-height: 60vh;
+  /* adjust this to your needs */
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.spinner-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6777ef !important;
+}

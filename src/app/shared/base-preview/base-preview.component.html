@@ -1,0 +1,19 @@
+<!-- fixed-top -->
+<div class="file-preview-toolbar d-flex" [dir]="direction" [ngClass]="direction">
+  <span class="back-arrow" *ngIf="!data.isFromPublicPreview">
+    <i-feather [name]="direction === 'rtl' ? 'arrow-right-circle' : 'arrow-left-circle'" (click)="closeToolbar()"></i-feather>
+  </span>
+  <span class="file-name flex-grow-1">{{currentDoc?.name}}</span>
+  <span (click)="downloadDocument(currentDoc)" class="back-arrow" *ngIf="isDownloadFlag">
+    <i-feather name="arrow-down-circle"></i-feather>
+  </span>
+</div>
+<ng-container [ngSwitch]="type">
+  <app-image-preview [document]="currentDoc" *ngSwitchCase="'image'"></app-image-preview>
+  <app-office-viewer [document]="currentDoc" *ngSwitchCase="'office'"></app-office-viewer>
+  <app-pdf-viewer [document]="currentDoc" *ngSwitchCase="'pdf'"></app-pdf-viewer>
+  <app-text-preview [document]="currentDoc" *ngSwitchCase="'text'"></app-text-preview>
+  <app-audio-preview [document]="currentDoc" *ngSwitchCase="'audio'"></app-audio-preview>
+  <app-video-preview [document]="currentDoc" *ngSwitchCase="'video'"></app-video-preview>
+  <app-no-preview-available [document]="currentDoc" [isDownloadFlag]="isDownloadFlag" *ngSwitchDefault></app-no-preview-available>
+</ng-container>

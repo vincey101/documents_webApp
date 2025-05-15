@@ -1,0 +1,130 @@
+<section class="content">
+    <div class="content-block">
+        <div class="block-header">
+            <div class="breadcrumb-main">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <span class="page-title">{{ "MANAGE_LANGUAGE" | translate }}
+                                <app-page-help-text code="LANGUAGES"></app-page-help-text>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="body">
+                        <div *ngIf="languageForm">
+                            <form [formGroup]="languageForm">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{'NAME' | translate}}</label>
+                                            <input class="form-control" type="text" formControlName="languageName" />
+                                            <div
+                                                *ngIf="languageForm.get('languageName').touched && languageForm.get('languageName').errors">
+                                                <div class="text-danger"
+                                                    *ngIf="languageForm.get('languageName').hasError('required')">
+                                                    {{"REQUIRED_FIELD" | translate}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>{{'ORDER' | translate}}</label>
+                                            <input class="form-control" type="number" formControlName="order" />
+                                            <div
+                                                *ngIf="languageForm.get('order').touched && languageForm.get('order').errors">
+                                                <div class="text-danger"
+                                                    *ngIf="languageForm.get('order').hasError('required')">
+                                                    {{"REQUIRED_FIELD" | translate}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <div class="form-check mt-4">
+                                                <input id="exampleCheck1" class="form-check-label" type="checkbox"
+                                                    formControlName="isRTL" />
+                                                <label class="p-l-20" for="exampleCheck1">{{'IS_RTL' |
+                                                    translate}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <!-- <mat-card class="cus-mat-card text-center"> -->
+                                        <input hidden (change)="onProductImageSelect($event)" #fileInput name="logo"
+                                            type="file" name="{{'IMAGE' | translate}}" fxFlex="30">
+                                        <img *ngIf="languageImgSrc" class="full-width img-fluid"
+                                            [src]="languageImgSrc" />
+                                        <img *ngIf="!languageImgSrc" class="full-width img-fluid"
+                                            src="assets/images/no-preview.jpg" />
+                                        <!-- <mat-card-actions> -->
+                                        <a type="button" class="m-t-5" *ngIf="!languageImgSrc"
+                                            (click)="fileInput.click()">
+                                            {{"ADD" | translate}}</a>
+                                        <a type="button" class="m-t-5" *ngIf="languageImgSrc"
+                                            (click)="fileInput.click()">
+                                            {{"CHANGE" | translate}}</a>
+                                        <!-- </mat-card-actions>
+                                        </mat-card> -->
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="row float-right">
+                                            <div class="mr-5">
+                                                <button type="button" (click)="onLanguageSubmit()"
+                                                    class="btn btn-success btn-sm m-r-10">
+                                                    <i-feather name="save" class="small-icon"></i-feather>
+                                                    {{"SAVE" | translate}}
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    [routerLink]="['/languages']">
+                                                    <i-feather name="x-circle" class="small-icon"></i-feather>
+                                                    {{"CANCEL" | translate}}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4" *ngFor="let field of fields">
+                                        <div class="form-group">
+                                            <label>{{defaultLanguage[field]}}</label>
+                                            <input class="form-control" type="text" [formControlName]="field" />
+                                            <div
+                                                *ngIf="languageForm.get(field).touched && languageForm.get(field).errors">
+                                                <div class="text-danger"
+                                                    *ngIf="languageForm.get(field).hasError('required')">
+                                                    {{"REQUIRED_FIELD" | translate}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mt-2">
+                                        <button type="button" (click)="onLanguageSubmit()"
+                                            class="btn btn-success btn-sm m-r-10">
+                                            <i-feather name="save" class="small-icon"></i-feather>
+                                            {{"SAVE" | translate}}
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            [routerLink]="['/languages']">
+                                            <i-feather name="x-circle" class="small-icon"></i-feather>
+                                            {{"CANCEL" | translate}}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

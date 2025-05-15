@@ -1,0 +1,60 @@
+<div class="d-flex">
+  <span mat-dialog-title>
+    <mat-icon>folder</mat-icon> {{data.name}}'s {{'COMMENT' | translate}}
+    <app-page-help-text [code]="'DOCUMENT_COMMENTS'"></app-page-help-text>
+  </span>
+  <button mat-icon-button class="close-button ms-auto" (click)="closeDialog()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<div mat-dialog-content class="pt-0">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="list-group">
+        <div *ngFor="let documentComment of documentComments" class="list-group-item list-group-item-action"
+          aria-current="true">
+          <h6 class="m-b-1">
+            {{documentComment.comment}}
+            <span role="button" class="badge" (click)="onDelete(documentComment.id)">
+              <i-feather name="trash" class="small-icon text-danger"></i-feather>
+            </span>
+          </h6>
+          <div class="w-100">
+            <small class="m-r-10">
+              {{documentComment.createdDate | utcToLocalTime:'short'}}
+            </small>
+            <small class="text-primary">{{documentComment?.createdByName}}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <form [formGroup]="commentForm" class="mt-3">
+        <div class="row">
+          <div class="col-md-12 m-t-10">
+            <textarea class="form-control" formControlName="comment" rows="3"></textarea>
+            <div class="text-danger"
+              *ngIf="commentForm.get('comment').touched && commentForm.get('comment').hasError('required')">
+              {{'COMMENT_IS_REQUIRED' | translate}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 m-t-10">
+            <button (click)="addComment()" type="submit" class="btn btn-success btn-sm m-r-10">
+              <i-feather name="send" class="small-icon"></i-feather>
+              {{'ADD_COMMENT' | translate}}
+            </button>
+            <button (click)="closeDialog()" type="submit" class="btn btn-sm btn-danger">
+              <i-feather name="x-circle" class="small-icon"></i-feather>
+              {{'CANCEL' | translate}}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
