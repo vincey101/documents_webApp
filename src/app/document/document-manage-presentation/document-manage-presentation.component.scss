@@ -1,7 +1,7 @@
 .preview-box {
     border: 1px solid #ddd;
     padding: 20px;
-    min-height: 460px;
+    min-height: 480px;
     max-height: 600px;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -46,6 +46,50 @@
         font-size: 14px;
         line-height: 1.6;
         color: #444;
+        
+        // Add Quill alignment styles for preview
+        .ql-align-center {
+            text-align: center;
+        }
+        
+        .ql-align-right {
+            text-align: right;
+        }
+        
+        .ql-align-justify {
+            text-align: justify;
+        }
+    }
+}
+
+// Quill alignment classes that might appear at block level
+::ng-deep {
+    .preview-content {
+        p.ql-align-center {
+            text-align: center;
+        }
+        
+        p.ql-align-right {
+            text-align: right;
+        }
+        
+        p.ql-align-justify {
+            text-align: justify;
+        }
+        
+        h1.ql-align-center,
+        h2.ql-align-center,
+        h3.ql-align-center,
+        h4.ql-align-center {
+            text-align: center;
+        }
+        
+        h1.ql-align-right,
+        h2.ql-align-right,
+        h3.ql-align-right,
+        h4.ql-align-right {
+            text-align: right;
+        }
     }
 }
 
@@ -58,15 +102,28 @@
     }
 }
 
-// CKEditor customization
+// Replace CKEditor customization with Quill customization
 ::ng-deep {
-    .ck-editor__editable {
-        min-height: 300px;
-    }
-
-    .ck.ck-editor {
-        border-radius: 4px;
-        overflow: hidden;
+    // Quill editor customization
+    .quill-editor-container {
+        margin-bottom: 15px;
+        
+        .ql-toolbar.ql-snow {
+            border-radius: 4px 4px 0 0;
+            border-color: #ccc;
+        }
+        
+        .ql-container.ql-snow {
+            border-radius: 0 0 4px 4px;
+            border-color: #ccc;
+            min-height: 300px;
+        }
+        
+        #quill-editor {
+            min-height: 270px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
     }
 }
 
@@ -212,6 +269,159 @@
             .ng-option {
                 font-size: 12px !important;
                 padding: 4px 8px !important;
+            }
+        }
+    }
+}
+
+::ng-deep {
+    // Additional Quill preview styling
+    .preview-content {
+        // Size styling
+        .ql-size-small {
+            font-size: 0.75em;
+        }
+        
+        .ql-size-large {
+            font-size: 1.5em;
+        }
+        
+        .ql-size-huge {
+            font-size: 2.5em;
+        }
+        
+        // List styling
+        .ql-indent-1 {
+            padding-left: 3em;
+        }
+        
+        .ql-indent-2 {
+            padding-left: 6em;
+        }
+        
+        ul, ol {
+            padding-left: 1.5em;
+        }
+        
+        // Block styling
+        blockquote {
+            border-left: 4px solid #ccc;
+            margin-bottom: 5px;
+            margin-top: 5px;
+            padding-left: 16px;
+        }
+        
+        code, pre {
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            padding: 2px 4px;
+            font-family: monospace;
+        }
+    }
+}
+
+// Template 2 styles
+.template2-preview {
+    .official-letterhead {
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .letterhead-logo-left {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .official-letter-content {
+        padding: 5px;
+        margin-top: -15px;
+    }
+}
+
+// Make sure Template 2 Quill styles penetrate Angular's view encapsulation
+::ng-deep {
+    .template2-preview {
+        .official-letter-content {
+            .preview-body {
+                // Alignment styles
+                .ql-align-center {
+                    text-align: center;
+                }
+                
+                .ql-align-right {
+                    text-align: right;
+                }
+                
+                .ql-align-justify {
+                    text-align: justify;
+                }
+                
+                p.ql-align-center {
+                    text-align: center;
+                }
+                
+                p.ql-align-right {
+                    text-align: right;
+                }
+                
+                p.ql-align-justify {
+                    text-align: justify;
+                }
+                
+                h1.ql-align-center,
+                h2.ql-align-center,
+                h3.ql-align-center,
+                h4.ql-align-center {
+                    text-align: center;
+                }
+                
+                h1.ql-align-right,
+                h2.ql-align-right,
+                h3.ql-align-right,
+                h4.ql-align-right {
+                    text-align: right;
+                }
+                
+                // Size styling
+                .ql-size-small {
+                    font-size: 0.75em;
+                }
+                
+                .ql-size-large {
+                    font-size: 1.5em;
+                }
+                
+                .ql-size-huge {
+                    font-size: 2.5em;
+                }
+                
+                // List styling
+                .ql-indent-1 {
+                    padding-left: 3em;
+                }
+                
+                .ql-indent-2 {
+                    padding-left: 6em;
+                }
+                
+                ul, ol {
+                    padding-left: 1.5em;
+                }
+                
+                // Block styling
+                blockquote {
+                    border-left: 4px solid #ccc;
+                    margin-bottom: 5px;
+                    margin-top: 5px;
+                    padding-left: 16px;
+                }
+                
+                code, pre {
+                    background-color: #f0f0f0;
+                    border-radius: 3px;
+                    padding: 2px 4px;
+                    font-family: monospace;
+                }
             }
         }
     }

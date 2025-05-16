@@ -4,6 +4,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  AfterViewInit,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
@@ -32,9 +34,10 @@ import { CommonService } from '@core/services/common.service';
 import { TranslationService } from '@core/services/translation.service';
 import { BaseComponent } from 'src/app/base.component';
 import { ClientStore } from 'src/app/client/client-store';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { Editor } from '@ckeditor/ckeditor5-core';
 import { OpenAIService } from '@core/services/openai.service';
+
+// Declare Quill as global variable
+declare var Quill: any;
 
 @Component({
   selector: 'app-document-manage-presentation',
@@ -44,7 +47,7 @@ import { OpenAIService } from '@core/services/openai.service';
 })
 export class DocumentManagePresentationComponent
   extends BaseComponent
-  implements OnInit {
+  implements OnInit, AfterViewInit {
   document: DocumentInfo;
   documentForm: UntypedFormGroup;
   extension = '';
@@ -69,38 +72,14 @@ export class DocumentManagePresentationComponent
   get documentMetaTagsArray(): FormArray {
     return <FormArray>this.documentForm.get('documentMetaTags');
   }
-  public Editor = ClassicEditor;
-  public editorConfig = {
-    toolbar: {
-      items: [
-        'heading',
-        '|',
-        'bold',
-        'italic',
-        'link',
-        'bulletedList',
-        'numberedList',
-        '|',
-        'alignment:left',
-        'alignment:center',
-        'alignment:right',
-        'alignment:justify',
-        '|',
-        'outdent',
-        'indent',
-        '|',
-        'blockQuote',
-        'undo',
-        'redo'
-      ]
-    },
-    placeholder: 'Type the content here...'
-  };
   public showAiPrompt = false;
   public aiPrompt = '';
   public isGenerating = false;
   public showModal = false;
   public errorMessage = '';
+
+  // Replace CKEditor with Quill
+  private quillEditor: any;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -125,6 +104,13 @@ export class DocumentManagePresentationComponent
     this.getCompanyProfile();
     this.getLangDir();
     this.getAllAllowFileExtension();
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize Quill after view init
+    setTimeout(() => {
+      this.initQuillEditor();
+    }, 0);
   }
 
   getLangDir() {
@@ -479,7 +465,26 @@ export class DocumentManagePresentationComponent
     return selectedRoles.map(role => role.name).join(', ');
   }
   
-   getSelectedThroughUsersString(): string {
+  getSelectedToUsersString(): string {
+    // Get selected To users
+    const selectedToUsers = this.documentForm?.get('selectedToUsers')?.value || [];
+    const toUsersString = selectedToUsers.length > 0 ? 
+      selectedToUsers.map(user => `${user.firstName} ${user.lastName}`).join(', ') : '';
+    
+    // Get selected roles
+    const selectedRoles = this.documentForm?.get('selectedRoles')?.value || [];
+    const rolesString = selectedRoles.length > 0 ?
+      selectedRoles.map(role => role.name).join(', ') : '';
+    
+    // Combine both strings with a comma if both have values
+    if (toUsersString && rolesString) {
+      return `${toUsersString}, ${rolesString}`;
+    } else {
+      return toUsersString || rolesString;
+    }
+  }
+  
+  getSelectedThroughUsersString(): string {
     const selectedThroughUsers = this.documentForm?.get('selectedThroughUsers')?.value;
     if (!selectedThroughUsers || selectedThroughUsers.length === 0) {
       return '';
@@ -540,6 +545,12 @@ export class DocumentManagePresentationComponent
           this.documentForm.patchValue({
             content: newContent
           });
+          
+          // Update Quill editor content
+          if (this.quillEditor) {
+            this.quillEditor.clipboard.dangerouslyPasteHTML(newContent);
+          }
+          
           this.isGenerating = false;
           this.closeAiModal();
         } else {
@@ -555,5 +566,46 @@ export class DocumentManagePresentationComponent
         this.cd.detectChanges();
       }
     });
+  }
+
+  // Initialize Quill editor
+  initQuillEditor(): void {
+    const editorElement = document.getElementById('quill-editor');
+    if (editorElement) {
+      this.quillEditor = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ 'header': 1 }, { 'header': 2 }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'indent': '-1'}, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'size': ['small', false, 'large', 'huge'] }],
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            ['clean'],
+            ['link', 'image']
+          ]
+        },
+        placeholder: 'Type the content here...'
+      });
+      
+      // Set initial content if any
+      const initialContent = this.documentForm.get('content').value;
+      if (initialContent) {
+        this.quillEditor.clipboard.dangerouslyPasteHTML(initialContent);
+      }
+      
+      // Setup content change handler
+      this.quillEditor.on('text-change', () => {
+        const content = this.quillEditor.root.innerHTML;
+        this.documentForm.get('content').setValue(content);
+        this.cd.detectChanges();
+      });
+    }
   }
 }

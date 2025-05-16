@@ -296,8 +296,10 @@
                             style="cursor: pointer; position: absolute; top: -10px; right: 3px; background-color: white; border: 2px solid #ddd; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; z-index: 1;">
                             <span style="color: #ff0000; font-weight: bold; font-size: 12px;">AI</span>
                           </div>
-                          <ckeditor [editor]="Editor" [config]="editorConfig" formControlName="content"
-                            (change)="onEditorChange($event)"></ckeditor>
+                          <div class="quill-editor-container">
+                            <div id="quill-editor"></div>
+                            <input type="hidden" formControlName="content">
+                          </div>
                         </div>
                         <div class="text-danger" *ngIf="
                             documentForm.get('content').touched &&
@@ -312,52 +314,100 @@
                   <!-- Preview Box -->
                   <div class="col-md-4">
                     <div class="preview-box" style="transform: scale(0.9); transform-origin: top center;">
-                      <div class="letterhead text-center">
-                        <img src="assets/images/nipss.png" alt="NIPSS Logo" class="letterhead-logo"
-                          style="max-width: 45px !important; height: auto !important;">
-                        <h4 class="mt-2 mb-0" style="font-size: 14px;">NATIONAL INSTITUTE</h4>
-                        <p class="department-name mb-1" *ngIf="documentForm.get('categoryId').value"
-                          style="font-size: 11px;">
-                          {{ getCategoryName(documentForm.get('categoryId').value) }}
-                        </p>
-                        <h5 class="memorandum-header mb-1" style="font-size: 12px;">MEMORANDUM</h5>
+                      <!-- Template 1 -->
+                      <div *ngIf="documentForm.get('templateType').value === 'template1'">
+                        <div class="letterhead text-center">
+                          <img src="assets/images/nipss.png" alt="NIPSS Logo" class="letterhead-logo"
+                            style="max-width: 45px !important; height: auto !important;">
+                          <h4 class="mt-2 mb-0" style="font-size: 14px;">NATIONAL INSTITUTE</h4>
+                          <p class="department-name mb-1" *ngIf="documentForm.get('categoryId').value"
+                            style="font-size: 11px;">
+                            {{ getCategoryName(documentForm.get('categoryId').value) }}
+                          </p>
+                          <h5 class="memorandum-header mb-1" style="font-size: 12px;">MEMORANDUM</h5>
+                        </div>
+                        <div class="memo-details"
+                          style="background-color: #f5f5f5; padding: 8px; border-radius: 4px; font-size: 10px; margin-top: -15px;">
+                          <div class="row mb-1">
+                            <div class="col-3" style="font-size: 10px;"><strong>To:</strong></div>
+                            <div class="col-9" style="font-size: 10px;">
+                              {{ getSelectedToUsersString() }}
+                            </div>
+                          </div>
+                          <div class="row mb-1">
+                            <div class="col-3" style="font-size: 10px;"><strong>Through:</strong></div>
+                            <div class="col-9" style="font-size: 10px;">
+                            {{ getSelectedThroughUsersString() }}  
+                            </div>
+                          </div>
+                          <div class="row mb-1">
+                            <div class="col-3" style="font-size: 10px;"><strong>From:</strong></div>
+                            <div class="col-9" style="font-size: 10px;">
+                              {{ getCurrentUser() }}
+                            </div>
+                          </div>
+                          <div class="row mb-1">
+                            <div class="col-3" style="font-size: 10px;"><strong>Date:</strong></div>
+                            <div class="col-9" style="font-size: 10px;">
+                              {{ getCurrentDate() | date:'mediumDate' }}
+                            </div>
+                          </div>
+                          <div class="row mb-1">
+                            <div class="col-3" style="font-size: 10px;"><strong>Subject:</strong></div>
+                            <div class="col-9" style="font-size: 10px;">
+                              {{ documentForm.get('subject').value }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="preview-content mt-2">
+                          <div class="preview-body" [innerHTML]="documentForm.get('content').value"
+                            style="font-size: 10px;"></div>
+                        </div>
                       </div>
-                      <div class="memo-details"
-                        style="background-color: #f5f5f5; padding: 8px; border-radius: 4px; font-size: 10px; margin-top: -15px;">
-                        <div class="row mb-1">
-                          <div class="col-3" style="font-size: 10px;"><strong>To:</strong></div>
-                          <div class="col-9" style="font-size: 10px;">
-                            {{ getSelectedRolesString() }}
+
+                      <!-- Template 2 - Official Letterhead -->
+                      <div *ngIf="documentForm.get('templateType').value === 'template2'" class="template2-preview">
+                        <div class="official-letterhead">
+                          <div class="row">
+                            <div class="col-2">
+                              <img src="assets/images/nipss.png" alt="NIPSS Logo" class="letterhead-logo-left"
+                                style="max-width: 45px !important; height: auto !important;">
+                            </div>
+                            <div class="col-10">
+                              <div class="d-flex flex-column">
+                                <div>
+                                  <h4 style="font-size: 8.5px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; letter-spacing: -0.2px;">
+                                    NATIONAL INSTITUTE FOR POLICY AND STRATEGIC STUDIES, KURU
+                                  </h4>
+                                </div>
+                                <div style="text-align: right; font-size: 8px; line-height: 1.2;">
+                                  <p class="mb-0" style="padding-right: 0;">PMB 2024, Bukuru, Plateau State, Nigeria</p>
+                                  <p class="mb-0" style="padding-right: 41px;">Email: info&#64;nipsskuru.gov.ng</p>
+                                  <P class="mb-0" style="padding-right: 78px;"><strong>Date:</strong> {{ getCurrentDate() | date:'mediumDate' }}</P>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="mt-3">
+                            <div class="row">
+                              <div class="col-12">
+                                <p style="font-size: 10px; padding-left: 15px; margin-bottom: 15px;">
+                                  <strong>Our Ref:</strong> ..........................
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        <div class="row mb-1">
-                          <div class="col-3" style="font-size: 10px;"><strong>Through:</strong></div>
-                          <div class="col-9" style="font-size: 10px;">
-                          {{ getSelectedThroughUsersString() }}  
+                        <div class="official-letter-content">
+                          <div *ngIf="documentForm.get('subject').value" style="margin-bottom: 15px;">
+                            <p style="font-size: 11px; font-weight: bold; text-align: center;">
+                              {{ documentForm.get('subject').value | uppercase }}
+                            </p>
                           </div>
+                          <div class="preview-body" [innerHTML]="documentForm.get('content').value"
+                            style="font-size: 10px;"></div>
                         </div>
-                        <div class="row mb-1">
-                          <div class="col-3" style="font-size: 10px;"><strong>From:</strong></div>
-                          <div class="col-9" style="font-size: 10px;">
-                            {{ getCurrentUser() }}
-                          </div>
-                        </div>
-                        <div class="row mb-1">
-                          <div class="col-3" style="font-size: 10px;"><strong>Date:</strong></div>
-                          <div class="col-9" style="font-size: 10px;">
-                            {{ getCurrentDate() | date:'mediumDate' }}
-                          </div>
-                        </div>
-                        <div class="row mb-1">
-                          <div class="col-3" style="font-size: 10px;"><strong>Subject:</strong></div>
-                          <div class="col-9" style="font-size: 10px;">
-                            {{ documentForm.get('subject').value }}
-                          </div>
-                        </div>
-                      </div>
-                      <div class="preview-content mt-2">
-                        <div class="preview-body" [innerHTML]="documentForm.get('content').value"
-                          style="font-size: 10px;"></div>
                       </div>
                     </div>
                   </div>
@@ -382,7 +432,7 @@
                         </div>
                         <div class="row" *ngIf="toUserPermissionFormGroup.get('isTimeBound').value">
                           <div class="col-md-6">
-                            <input [min]="minDate" class="form-control" placeholder="{{'CHOOSE_A_START_DATE' | translate}}"
+                            <input [min]="minDate" class="form-control" placeholder="{{'Start Date' | translate}}"
                               formControlName="startDate" [owlDateTimeTrigger]="date1" [owlDateTime]="date1">
                             <owl-date-time #date1></owl-date-time>
                             <mat-error class="text-danger"
@@ -392,7 +442,7 @@
                           </div>
                           <div class="col-md-6">
                             <input [min]="toUserPermissionFormGroup.get('startDate').value" class="form-control"
-                              placeholder="{{'CHOOSE_A_END_DATE' | translate}}" formControlName="endDate"
+                              placeholder="{{'End Date' | translate}}" formControlName="endDate"
                               [owlDateTimeTrigger]="date2" [owlDateTime]="date2">
                             <owl-date-time #date2></owl-date-time>
                             <mat-error class="text-danger"
@@ -424,7 +474,7 @@
                         </div>
                         <div class="row" *ngIf="throughUserPermissionFormGroup.get('isTimeBound').value">
                           <div class="col-md-6">
-                            <input [min]="minDate" class="form-control" placeholder="{{'CHOOSE_A_START_DATE' | translate}}"
+                            <input [min]="minDate" class="form-control" placeholder="{{'Start Date' | translate}}"
                               formControlName="startDate" [owlDateTimeTrigger]="date3" [owlDateTime]="date3">
                             <owl-date-time #date3></owl-date-time>
                             <mat-error class="text-danger"
@@ -434,7 +484,7 @@
                           </div>
                           <div class="col-md-6">
                             <input [min]="throughUserPermissionFormGroup.get('startDate').value" class="form-control"
-                              placeholder="{{'CHOOSE_A_END_DATE' | translate}}" formControlName="endDate"
+                              placeholder="{{'End Date' | translate}}" formControlName="endDate"
                               [owlDateTimeTrigger]="date4" [owlDateTime]="date4">
                             <owl-date-time #date4></owl-date-time>
                             <mat-error class="text-danger"
@@ -466,7 +516,7 @@
                         <div class="row" *ngIf="rolePermissionFormGroup.get('isTimeBound').value">
                           <div class="col-md-6">
                             <input [min]="minDate" class="form-control"
-                              placeholder="{{'CHOOSE_A_START_DATE' | translate}}" formControlName="startDate"
+                              placeholder="{{'Start Date' | translate}}" formControlName="startDate"
                               [owlDateTimeTrigger]="date5" [owlDateTime]="date5">
                             <owl-date-time #date5></owl-date-time>
                             <mat-error class="text-danger"
@@ -476,7 +526,7 @@
                           </div>
                           <div class="col-md-6">
                             <input [min]="rolePermissionFormGroup.get('startDate').value" class="form-control"
-                              placeholder="{{'CHOOSE_A_END_DATE' | translate}}" formControlName="endDate"
+                              placeholder="{{'End Date' | translate}}" formControlName="endDate"
                               [owlDateTimeTrigger]="date6" [owlDateTime]="date6">
                             <owl-date-time #date6></owl-date-time>
                             <mat-error class="text-danger"
@@ -564,3 +614,7 @@
 
 <!-- Modal backdrop -->
 <div class="modal-backdrop fade show" *ngIf="showModal"></div>
+
+<!-- Quill Editor Assets -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
