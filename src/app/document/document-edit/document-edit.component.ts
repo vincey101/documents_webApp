@@ -133,6 +133,7 @@ export class DocumentEditComponent extends BaseComponent implements OnInit {
       description: this.documentForm.get('description').value,
       name: this.documentForm.get('name').value,
       documentMetaDatas: [...documentMetaTags],
+      modifiedDate: new Date()
     };
     return document;
   }

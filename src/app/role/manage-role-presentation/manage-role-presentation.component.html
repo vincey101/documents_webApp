@@ -46,6 +46,41 @@
                       </div>
                   </div>
                 </div>
+                
+                <!-- Position Permissions Section -->
+                <div fxLayout="row wrap" class="mt-4">
+                  <div fxFlex="100" fxFlex.sm="100">
+                    <mat-checkbox color="primary" (change)="onPositionPageSelect($event)">
+                      <b> {{'Position Management' | translate}}</b>
+                    </mat-checkbox>
+                  </div>
+                  <div class="row m-l-15">
+                    <div class="col-sm-3 row">
+                      <mat-checkbox color="primary" [checked]="checkPermission('POSITION_VIEW_POSITIONS')"
+                        (change)="onPositionPermissionChange($any($event), 'POSITION_VIEW_POSITIONS')">
+                        {{'View Position' | translate}}
+                      </mat-checkbox>
+                    </div>
+                    <div class="col-sm-3 row">
+                      <mat-checkbox color="primary" [checked]="checkPermission('POSITION_CREATE_POSITION')"
+                        (change)="onPositionPermissionChange($any($event), 'POSITION_CREATE_POSITION')">
+                        {{'Create Position' | translate}}
+                      </mat-checkbox>
+                    </div>
+                    <div class="col-sm-3 row">
+                      <mat-checkbox color="primary" [checked]="checkPermission('POSITION_EDIT_POSITION')"
+                        (change)="onPositionPermissionChange($any($event), 'POSITION_EDIT_POSITION')">
+                        {{'Edit Position' | translate}}
+                      </mat-checkbox>
+                    </div>
+                    <div class="col-sm-3 row">
+                      <mat-checkbox color="primary" [checked]="checkPermission('POSITION_DELETE_POSITION')"
+                        (change)="onPositionPermissionChange($any($event), 'POSITION_DELETE_POSITION')">
+                        {{'Delete Position' | translate}}
+                      </mat-checkbox>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -10,6 +10,6 @@ export class DocumentResource extends ResourceParameter {
   deletedBy?: string= '';
   clientId?: string = '';
   operation?: string = '';
-  statusId?: string = '';
+  statusId?: string = '' ;
   documentId?: string = '';
 }

@@ -1,0 +1,10 @@
+// Hide location column
+::ng-deep {
+  .mat-column-location {
+    display: none !important;
+  }
+  
+  [matColumnDef="location"] {
+    display: none !important;
+  }
+}

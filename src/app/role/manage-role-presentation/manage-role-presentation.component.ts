@@ -7,6 +7,14 @@ import { TranslationService } from '@core/services/translation.service';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
+// Position permission codes
+const POSITION_PERMISSIONS = [
+  'POSITION_VIEW_POSITIONS',
+  'POSITION_CREATE_POSITION',
+  'POSITION_EDIT_POSITION',
+  'POSITION_DELETE_POSITION'
+];
+
 @Component({
   selector: 'app-manage-role-presentation',
   templateUrl: './manage-role-presentation.component.html',
@@ -55,6 +63,18 @@ export class ManageRolePresentationComponent extends BaseComponent {
           }
         });
       });
+      
+      // Also add position permissions
+      POSITION_PERMISSIONS.forEach(permissionCode => {
+        if (!this.checkPermission(permissionCode)) {
+          this.role.roleClaims.push({
+            roleId: this.role.id,
+            claimType: permissionCode,
+            claimValue: '',
+            actionId: permissionCode,
+          });
+        }
+      });
     } else {
       this.role.roleClaims = [];
     }
@@ -62,7 +82,7 @@ export class ManageRolePresentationComponent extends BaseComponent {
 
   checkPermission(actionId: string): boolean {
     const pageAction = this.role.roleClaims.find(
-      (c) => c.actionId === actionId
+      (c) => c.actionId === actionId || c.claimType === actionId
     );
     if (pageAction) {
       return true;
@@ -82,6 +102,50 @@ export class ManageRolePresentationComponent extends BaseComponent {
     } else {
       const roleClaimToRemove = this.role.roleClaims.find(
         (c) => c.actionId === action.id
+      );
+      const index = this.role.roleClaims.indexOf(roleClaimToRemove, 0);
+      if (index > -1) {
+        this.role.roleClaims.splice(index, 1);
+      }
+    }
+  }
+  
+  // Position permissions handling
+  
+  onPositionPageSelect(event: MatCheckboxChange) {
+    if (event.checked) {
+      // Add all position permissions
+      POSITION_PERMISSIONS.forEach(permissionCode => {
+        if (!this.checkPermission(permissionCode)) {
+          this.role.roleClaims.push({
+            roleId: this.role.id,
+            claimType: permissionCode,
+            claimValue: '',
+            actionId: permissionCode,
+          });
+        }
+      });
+    } else {
+      // Remove all position permissions
+      this.role.roleClaims = this.role.roleClaims.filter(
+        c => !POSITION_PERMISSIONS.includes(c.claimType)
+      );
+    }
+  }
+  
+  onPositionPermissionChange(flag: MatSlideToggleChange, permissionCode: string) {
+    if (flag.checked) {
+      // Add position permission
+      this.role.roleClaims.push({
+        roleId: this.role.id,
+        claimType: permissionCode,
+        claimValue: '',
+        actionId: permissionCode,
+      });
+    } else {
+      // Remove position permission
+      const roleClaimToRemove = this.role.roleClaims.find(
+        c => c.claimType === permissionCode
       );
       const index = this.role.roleClaims.indexOf(roleClaimToRemove, 0);
       if (index > -1) {

@@ -97,6 +97,14 @@ const routes: Routes = [
               ),
           },
           {
+            path: 'positions',
+            canLoad: [AuthGuard],
+            loadChildren: () =>
+              import('./position/position.module').then(
+                (m) => m.PositionModule
+              ),
+          },
+          {
             path: 'documents',
             canLoad: [AuthGuard],
             loadChildren: () =>

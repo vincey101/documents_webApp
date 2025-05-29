@@ -70,6 +70,10 @@
                   <th mat-header-cell *matHeaderCellDef> {{'LAST_NAME' | translate}} </th>
                   <td mat-cell *matCellDef="let user"> {{user.lastName}} </td>
                 </ng-container>
+                <ng-container matColumnDef="department">
+                  <th mat-header-cell *matHeaderCellDef> {{'Department' | translate}} </th>
+                  <td mat-cell *matCellDef="let user"> {{user.department}} </td>
+                </ng-container>
                 <ng-container matColumnDef="phoneNumber">
                   <th mat-header-cell *matHeaderCellDef> {{'MOBILE_NUMBER' | translate}} </th>
                   <td mat-cell *matCellDef="let user"> {{user.phoneNumber}} </td>

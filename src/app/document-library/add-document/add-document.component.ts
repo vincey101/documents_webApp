@@ -253,6 +253,7 @@ export class AddDocumentComponent extends BaseComponent implements OnInit {
       extension: this.extension,
       location: this.documentForm.get('location').value,
       clientId: this.documentForm.get('clientId').value ?? '',
+      modifiedDate: new Date()
     };
     const selectedRoles: Role[] =
       this.documentForm.get('selectedRoles').value ?? [];

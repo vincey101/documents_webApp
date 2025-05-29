@@ -23,6 +23,7 @@ export class UserListComponent extends BaseComponent implements OnInit {
     'email',
     'firstName',
     'lastName',
+    'department',
     'phoneNumber',
   ];
   constructor(

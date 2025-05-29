@@ -18,7 +18,7 @@
         </div>
       </div>
       <div class="col-md-6">
-        <label class="form-label">{{'CATEGORY' | translate}}</label>
+        <label class="form-label">{{'Department' | translate}}</label>
         <ng-select formControlName="categoryId" [clearable]="false">
           <ng-option *ngFor="let category of categoryStore.categories()" [value]="category.id">
             <div class="country-item"
@@ -37,19 +37,6 @@
           {{'CATEGORY_NAME_IS_REQUIRED' | translate}}
         </div>
       </div>
-      <div class="col-sm-6">
-        <label  class="form-label">{{ 'CLIENT' | translate }}</label>
-        <ng-select formControlName="clientId" placeholder="{{'CLIENT' | translate}}">
-          <ng-option *ngFor="let client of clientStore.clients()" [value]="client.id">
-            <span> {{ client.companyName }} </span>
-          </ng-option>
-        </ng-select>
-      </div>
-      <div class="col-sm-12 m-b-10">
-        <label class="form-label">{{'DESCRIPTION' | translate}}</label>
-        <textarea formControlName="description" class="form-control">
-        </textarea>
-      </div> 
       <div class="col-md-6">
         <label class="form-label">{{ 'DOCUMENT_STATUS' | translate }}</label>
         <ng-select formControlName="statusId" [searchable]="true"
@@ -58,24 +45,12 @@
             <span [ngStyle]="{'color': documentStatus?.colorCode}"> {{ documentStatus.name }} </span>
           </ng-option>
         </ng-select>
-      </div>                           
-      <div class="col-sm-6">
-        <div formArrayName="documentMetaTags"
-          *ngFor="let documentmetatag of documentMetaTagsArray.controls; let i=index">
-          <ng-container [formGroupName]="i">
-            <label class="form-label" *ngIf="i===0"> {{'META_TAGS' | translate}} </label>
-            <div class="input-group m-b-5">
-              <input (change)="onMetatagChange($event,i)" formControlName="metatag" class="form-control" type="text">
-              <button *ngIf="i===0" (click)="onAddAnotherMetaTag()" class="btn btn-success" type="button">
-                <i-feather name="Plus" class="btn-success btn-sm small-icon"></i-feather>
-              </button>
-              <button *ngIf="i!==0" (click)="onDeleteMetaTag(i)" class="btn btn-outline-danger" type="button">
-                <i-feather name="trash" class="btn-danger btn-sm small-icon"></i-feather>
-              </button>
-            </div>
-          </ng-container>
-        </div>
-      </div>                               
+      </div>
+      <div class="col-sm-12 m-b-10">
+        <label class="form-label">{{'DESCRIPTION' | translate}}</label>
+        <textarea formControlName="description" class="form-control">
+        </textarea>
+      </div>                             
       <div class="m-t-10 col-md-12">
         <button *hasClaim="['ALL_DOCUMENTS_EDIT_DOCUMENT','ASSIGNED_DOCUMENTS_EDIT_DOCUMENT']"
           class="btn btn-success btn-sm m-r-10" (click)="SaveDocument()" cdkFocusInitial>

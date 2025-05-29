@@ -220,4 +220,10 @@ export class DocumentService {
       .delete(url)
       .pipe(catchError(this.commonHttpErrorService.handleError));
   }
+
+  saveDocument(formData: FormData): Observable<DocumentInfo | CommonError> {
+    const url = `document`;
+    return this.httpClient.post<DocumentInfo>(url, formData)
+      .pipe(catchError(this.commonHttpErrorService.handleError));
+  }
 }

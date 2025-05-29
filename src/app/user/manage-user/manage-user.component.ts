@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -12,6 +12,9 @@ import { TranslationService } from '@core/services/translation.service';
 import { ToastrService } from 'ngx-toastr';
 import { BaseComponent } from 'src/app/base.component';
 import { UserService } from '../user.service';
+import { CategoryStore } from 'src/app/category/store/category-store';
+import { PositionStore } from 'src/app/position/store/position-store';
+import { Direction } from '@angular/cdk/bidi';
 
 @Component({
   selector: 'app-manage-user',
@@ -23,6 +26,10 @@ export class ManageUserComponent extends BaseComponent implements OnInit {
   userForm: UntypedFormGroup;
   roleList: Role[];
   isEditMode = false;
+  direction: Direction;
+  categoryStore = inject(CategoryStore);
+  positionStore = inject(PositionStore);
+
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -40,7 +47,12 @@ export class ManageUserComponent extends BaseComponent implements OnInit {
     this.sub$.sink = this.activeRoute.data.subscribe((data: { user: User }) => {
       if (data.user) {
         this.isEditMode = true;
-        this.userForm.patchValue(data.user);
+        const userFormData = {
+          ...data.user,
+          department: data.user.categoryId, 
+          position: data.user.positionId
+        };
+        this.userForm.patchValue(userFormData);
         this.user = data.user;
         this.userForm.get('email').disable();
       } else {
@@ -53,6 +65,8 @@ export class ManageUserComponent extends BaseComponent implements OnInit {
       }
     });
     this.getRoles();
+    this.categoryStore.loadByCategory();
+    this.positionStore.loadByPosition();
   }
 
   createUserForm() {
@@ -61,6 +75,8 @@ export class ManageUserComponent extends BaseComponent implements OnInit {
         id: [''],
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]],
+        department: ['', [Validators.required]],
+        position: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
         phoneNumber: ['', [Validators.required]],
         password: [''],
@@ -109,6 +125,8 @@ export class ManageUserComponent extends BaseComponent implements OnInit {
       id: this.userForm.get('id').value,
       firstName: this.userForm.get('firstName').value,
       lastName: this.userForm.get('lastName').value,
+      categoryId: this.userForm.get('department').value,
+      positionId: this.userForm.get('position').value,
       email: this.userForm.get('email').value,
       phoneNumber: this.userForm.get('phoneNumber').value,
       password: this.userForm.get('password').value,

@@ -34,6 +34,46 @@
                   </div>
                 </div>
                 <div class="col-md-6">
+                  <label class="form-label">{{'Department' | translate}} *</label>
+                  <ng-select formControlName="department" placeholder="{{'Department' | translate}}" [required]="true">
+                    <ng-option *ngFor="let category of categoryStore.categories()" [value]="category.id">
+                      <div class="country-item"
+                        [ngStyle]="this.direction === 'rtl'? {'margin-right.px': category.deafLevel* 20} : {'margin-left.px': category.deafLevel* 20}">
+                        <div *ngIf="!category.parentId">
+                          <b> {{category.name}}</b>
+                        </div>
+                        <div *ngIf="category.parentId">
+                          {{category.name}}
+                        </div>
+                      </div>
+                    </ng-option>
+                  </ng-select>
+                  <div class="text-danger"
+                    *ngIf="userForm.get('department')?.touched && userForm.get('department')?.hasError('required')">
+                    {{'Department is required' | translate}}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{'Position' | translate}} *</label>
+                  <ng-select formControlName="position" placeholder="{{'Position' | translate}}" [required]="true">
+                    <ng-option *ngFor="let position of positionStore.positions()" [value]="position.id">
+                      <div class="country-item"
+                        [ngStyle]="this.direction === 'rtl'? {'margin-right.px': position.deafLevel* 20} : {'margin-left.px': position.deafLevel* 20}">
+                        <div *ngIf="!position.parentId">
+                          <b> {{position.name}}</b>
+                        </div>
+                        <div *ngIf="position.parentId">
+                          {{position.name}}
+                        </div>
+                      </div>
+                    </ng-option>
+                  </ng-select>
+                  <div class="text-danger"
+                    *ngIf="userForm.get('position')?.touched && userForm.get('position')?.hasError('required')">
+                    {{'Position is required' | translate}}
+                  </div>
+                </div>
+                <div class="col-md-6">
                   <label class="form-label">{{'MOBILE_NUMBER' | translate}}</label>
                   <input formControlName="phoneNumber" class="form-control" type="text">
                   <div class="text-danger"

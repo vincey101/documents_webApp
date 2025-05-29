@@ -1,0 +1,39 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title">{{'Manage Position' | translate}}
+    <!-- <app-page-help-text [code]="'POSITIONS'"></app-page-help-text> -->
+</span>
+</div>
+<mat-dialog-content>
+  <form [formGroup]="positionForm" novalidate>
+    <div class="row">
+      <div class="col-sm-12">
+        <label class="form-label" for="positionName">{{'NAME' | translate}}</label>
+        <input formControlName="name" type="text" class="form-control" id="positionName">
+        <div *ngIf="positionForm.get('name').hasError('required') && positionForm.get('name').touched">
+          <div class="text-danger">
+            {{'Position name is required' | translate}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <label class="form-label" for="description">{{'DESCRIPTION' | translate}}</label>
+        <textarea formControlName="description" name="description" type="text" class="form-control">
+            </textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 mt-3">
+        <button (click)="savePosition()" type="submit" class="btn btn-success btn-sm m-r-10">
+          <i-feather name="save" class="small-icon"></i-feather>
+          {{'SAVE' | translate}}
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" (click)="onCancel()"> <i-feather name="x-circle"
+            class="small-icon"></i-feather>
+          {{'CANCEL' | translate}}
+        </button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content> 

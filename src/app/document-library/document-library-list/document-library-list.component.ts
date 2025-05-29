@@ -65,10 +65,9 @@ export class DocumentLibraryListComponent
     'action',
     'name',
     'categoryName',
-    'location',
-    'companyName',
     'statusName',
     'createdDate',
+    'modifiedDate',
     'expiredDate',
     'createdBy',
   ];
@@ -135,31 +134,35 @@ export class DocumentLibraryListComponent
       )
       .subscribe();
 
-    this.sub$.sink = fromEvent(this.input.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(1000),
-        distinctUntilChanged(),
-        tap(() => {
-          this.paginator.pageIndex = 0;
-          this.documentResource.skip = 0;
-          this.documentResource.name = this.input.nativeElement.value;
-          this.dataSource.loadDocuments(this.documentResource);
-        })
-      )
-      .subscribe();
+    if (this.input?.nativeElement) {
+      this.sub$.sink = fromEvent(this.input.nativeElement, 'keyup')
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged(),
+          tap(() => {
+            this.paginator.pageIndex = 0;
+            this.documentResource.skip = 0;
+            this.documentResource.name = this.input.nativeElement.value;
+            this.dataSource.loadDocuments(this.documentResource);
+          })
+        )
+        .subscribe();
+    }
 
-    this.sub$.sink = fromEvent(this.metatag.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(1000),
-        distinctUntilChanged(),
-        tap(() => {
-          this.paginator.pageIndex = 0;
-          this.documentResource.skip = 0;
-          this.documentResource.metaTags = this.metatag.nativeElement.value;
-          this.dataSource.loadDocuments(this.documentResource);
-        })
-      )
-      .subscribe();
+    if (this.metatag?.nativeElement) {
+      this.sub$.sink = fromEvent(this.metatag.nativeElement, 'keyup')
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged(),
+          tap(() => {
+            this.paginator.pageIndex = 0;
+            this.documentResource.skip = 0;
+            this.documentResource.metaTags = this.metatag.nativeElement.value;
+            this.dataSource.loadDocuments(this.documentResource);
+          })
+        )
+        .subscribe();
+    }
   }
 
   onCategoryChange(filtervalue: string) {
@@ -447,5 +450,20 @@ export class DocumentLibraryListComponent
           data: { document, link },
         });
       });
+  }
+
+  getCurrentDate(): Date {
+    return new Date();
+  }
+
+  isCompletedOrInProgress(statusName: string): boolean {
+    if (!statusName) return false;
+    
+    const lowerStatus = statusName.toLowerCase();
+    return lowerStatus === 'in progress' || 
+           lowerStatus === 'completed' ||
+           lowerStatus === 'complete' ||
+           lowerStatus === 'done' ||
+           lowerStatus === 'finished';
   }
 }

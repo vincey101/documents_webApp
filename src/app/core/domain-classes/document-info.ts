@@ -35,4 +35,11 @@ export interface DocumentInfo {
   updatedByName?: string;
   modifiedDate?: Date;
   companyName?: string;
+  templateType?: string;
+  subject?: string;
+  content?: string;
+  toUserEndDate?: Date;
+  isAutoAssign?: boolean;
+  selectedToUsers?: any[];
+  selectedUsers?: any[];
 }

@@ -318,8 +318,11 @@
                       <div *ngIf="documentForm.get('templateType').value === 'template1'">
                         <div class="letterhead text-center">
                           <img src="assets/images/nipss.png" alt="NIPSS Logo" class="letterhead-logo"
-                            style="max-width: 45px !important; height: auto !important;">
+                            style="max-width: 75px !important; height: auto !important;">
                           <h4 class="mt-2 mb-0" style="font-size: 14px;">NATIONAL INSTITUTE</h4>
+                          <p class="mb-1" style="font-size: 12px; font-style: italic; margin-top: 2px;">
+                            {{ userDepartment.includes('Dept') ? userDepartment : userDepartment + ' Department' }}
+                          </p>
                           <p class="department-name mb-1" *ngIf="documentForm.get('categoryId').value"
                             style="font-size: 11px;">
                             {{ getCategoryName(documentForm.get('categoryId').value) }}
@@ -327,7 +330,7 @@
                           <h5 class="memorandum-header mb-1" style="font-size: 12px;">MEMORANDUM</h5>
                         </div>
                         <div class="memo-details"
-                          style="background-color: #f5f5f5; padding: 8px; border-radius: 4px; font-size: 10px; margin-top: -15px;">
+                          style="background-color: #f5f5f5 !important; padding: 8px; font-size: 10px; margin-top: -15px;">
                           <div class="row mb-1">
                             <div class="col-3" style="font-size: 10px;"><strong>To:</strong></div>
                             <div class="col-9" style="font-size: 10px;">
@@ -337,7 +340,7 @@
                           <div class="row mb-1">
                             <div class="col-3" style="font-size: 10px;"><strong>Through:</strong></div>
                             <div class="col-9" style="font-size: 10px;">
-                            {{ getSelectedThroughUsersString() }}  
+                              {{ getSelectedThroughUsersString() }}
                             </div>
                           </div>
                           <div class="row mb-1">
@@ -369,14 +372,14 @@
                       <div *ngIf="documentForm.get('templateType').value === 'template2'" class="template2-preview">
                         <div class="official-letterhead">
                           <div class="row">
-                            <div class="col-2">
+                            <div class="col-2" style="margin-top: -10px; margin-left: -15px;">
                               <img src="assets/images/nipss.png" alt="NIPSS Logo" class="letterhead-logo-left"
-                                style="max-width: 45px !important; height: auto !important;">
+                                style="max-width: 75px !important; height: auto !important;">
                             </div>
                             <div class="col-10">
                               <div class="d-flex flex-column">
                                 <div>
-                                  <h4 style="font-size: 8.5px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; letter-spacing: -0.2px;">
+                                  <h4 style="font-size: 8.5px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: -0.2px;">
                                     NATIONAL INSTITUTE FOR POLICY AND STRATEGIC STUDIES, KURU
                                   </h4>
                                 </div>
@@ -389,7 +392,7 @@
                             </div>
                           </div>
                           
-                          <div class="mt-3">
+                          <!-- <div class="mt-3">
                             <div class="row">
                               <div class="col-12">
                                 <p style="font-size: 10px; padding-left: 15px; margin-bottom: 15px;">
@@ -397,10 +400,10 @@
                                 </p>
                               </div>
                             </div>
-                          </div>
+                          </div> -->
                         </div>
                         <div class="official-letter-content">
-                          <div *ngIf="documentForm.get('subject').value" style="margin-bottom: 15px;">
+                          <div *ngIf="documentForm.get('subject').value" style="margin-bottom: 10px;">
                             <p style="font-size: 11px; font-weight: bold; text-align: center;">
                               {{ documentForm.get('subject').value | uppercase }}
                             </p>
@@ -420,8 +423,9 @@
                     <div class="col-md-3 sharing-field" *hasClaim="'ALL_DOCUMENTS_SHARE_DOCUMENT'">
                       <h6 class="vew-mail-header">{{'To:' | translate}}</h6>
                       <ng-select [multiple]="true" formControlName="selectedToUsers" class="compact-select">
-                        <ng-option *ngFor="let user of users" [value]="user">{{user.firstName}}
-                          {{user.lastName}}</ng-option>
+                        <ng-option *ngFor="let user of userStore.formattedUserPositions()" [value]="user">
+                          {{user.displayName}}
+                        </ng-option>
                       </ng-select>
                       <ng-container *ngIf="documentForm.get('selectedToUsers')?.value?.length > 0"
                         formGroupName="toUserPermissionForm">
@@ -462,8 +466,9 @@
                     <div class="col-md-3 sharing-field" *hasClaim="'ALL_DOCUMENTS_SHARE_DOCUMENT'">
                       <h6 class="vew-mail-header">{{'Through:' | translate}}</h6>
                       <ng-select [multiple]="true" formControlName="selectedThroughUsers" class="compact-select">
-                        <ng-option *ngFor="let user of users" [value]="user">{{user.firstName}}
-                          {{user.lastName}}</ng-option>
+                        <ng-option *ngFor="let user of userStore.formattedUserPositions()" [value]="user">
+                          {{user.displayName}}
+                        </ng-option>
                       </ng-select>
                       <ng-container *ngIf="documentForm.get('selectedThroughUsers')?.value?.length > 0"
                         formGroupName="throughUserPermissionForm">
@@ -501,7 +506,7 @@
                     </div>
 
                     <!-- Role Sharing -->
-                    <div class="col-md-3 sharing-field" *hasClaim="'ALL_DOCUMENTS_SHARE_DOCUMENT'">
+                    <!-- <div class="col-md-3 sharing-field" *hasClaim="'ALL_DOCUMENTS_SHARE_DOCUMENT'">
                       <h6 class="vew-mail-header">{{'Share with roles' | translate}}</h6>
                       <ng-select [multiple]="true" formControlName="selectedRoles" class="compact-select">
                         <ng-option *ngFor="let role of roles" [value]="role">{{role.name}}</ng-option>
@@ -540,19 +545,14 @@
                             translate}}</mat-checkbox>
                         </div>
                       </ng-container>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
 
                 <!-- Document Upload -->
                 <div class="col-md-3 ms-2">
-                  <label class="form-label">{{'DOCUMENT_UPLOAD' | translate}}</label>
+                  <label class="form-label">{{'Document Upload (Optional)' | translate}}</label>
                   <input class="form-control" #file (change)="upload(file.files)" type="file">
-                  <div *ngIf="documentForm.get('url').touched && documentForm.get('url')?.errors">
-                    <div class="text-danger" *ngIf="documentForm.get('url').touched  && documentForm.get('url').errors?.['required']">
-                      {{'DOCUMENT_IS_REQUIRED' | translate}}
-                    </div>
-                  </div>
                   <div
                     *ngIf="(documentForm.get('extension').touched || documentForm.get('extension').dirty) && documentForm.get('url').errors">
                     <div class="text-danger" *ngIf="documentForm.get('extension').errors?.['required']">
@@ -563,14 +563,19 @@
 
                 <!-- Action Buttons -->
                 <div class="col-md-12 mt-4 text-center">
-                  <button class="btn btn-success btn-lg m-r-10" style="padding: 10px 30px; font-size: 1.1rem;" (click)="SaveDocument()" cdkFocusInitial>
-                    <i-feather name="save" class="small-icon"></i-feather>
+                  <button class="btn btn-success btn-lg m-r-10" style="padding: 10px 30px; font-size: 1.1rem;" (click)="SaveDocument()" [disabled]="loading" cdkFocusInitial>
+                    <i-feather *ngIf="!loading" name="save" class="small-icon"></i-feather>
+                    <span *ngIf="loading"><i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i></span>
                     {{ "SAVE" | translate }}
                   </button>
                   <button type="button" class="btn btn-danger btn-lg" style="padding: 10px 30px; font-size: 1.1rem;" [routerLink]="['/']">
                     <i-feather name="x-circle" class="small-icon"></i-feather>
                     {{ "CANCEL" | translate }}
                   </button>
+                  <!-- <button class="btn btn-primary btn-lg m-l-10" style="padding: 10px 30px; font-size: 1.1rem;" (click)="exportToPDF()">
+                    <i-feather name="download" class="small-icon"></i-feather>
+                    Export PDF
+                  </button> -->
                 </div>
               </div>
             </form>
@@ -618,3 +623,75 @@
 <!-- Quill Editor Assets -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+<!-- Result Display Section -->
+<div class="row mt-4" *ngIf="resultArray.length > 0">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Document Upload Results</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Status</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let file of resultArray; let i = index">
+                <td>{{file.name}}</td>
+                <td>
+                  <span *ngIf="file.isSuccess" class="badge bg-success">Success</span>
+                  <span *ngIf="!file.isSuccess" class="badge bg-danger">Failed</span>
+                </td>
+                <td>{{file.message}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Files Pending Upload Section -->
+<div class="row mt-3" *ngIf="fileInputs.controls.length > 0">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Files Ready to Upload</h5>
+      </div>
+      <div class="card-body">
+        <ul formArrayName="files" class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center"
+              *ngFor="let file of fileInputs.controls; let i = index">
+            <div class="row w-100" [formGroupName]="i">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input formControlName="name" class="form-control" type="text"
+                         placeholder="{{ 'SELECTED_FILE_NAME' | translate }}"
+                         [value]="file.get('name').value" />
+                </div>
+                <div *ngIf="file.get('name').touched && file.get('name').errors">
+                  <div class="text-danger" *ngIf="file.get('name').errors?.['required']">
+                    {{ "NAME_IS_REQUIRED" | translate }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <button class="btn btn-danger btn-sm" type="button" (click)="removeFile(i)">
+                  <i-feather *ngIf="!file.get('isLoading').value" name="trash" class="small-icon"></i-feather>
+                  <i-feather *ngIf="file.get('isLoading').value" name="loader" class="small-icon"></i-feather>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

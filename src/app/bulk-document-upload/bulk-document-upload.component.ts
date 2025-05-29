@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { ReactiveFormsModule, FormsModule, FormArray, UntypedFormGroup, FormGroup, Validators, UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -21,7 +21,7 @@ import { Role } from '@core/domain-classes/role';
 import { DocumentOperation } from '@core/domain-classes/document-operation';
 import { DocumentAuditTrail } from '@core/domain-classes/document-audit-trail';
 import { AllowFileExtension } from '@core/domain-classes/allow-file-extension';
-import { catchError, concatMap, from, of } from 'rxjs';
+import { catchError, concatMap, from, of, map } from 'rxjs';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Direction } from '@angular/cdk/bidi';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime-ex';
@@ -29,6 +29,9 @@ import { SecurityService } from '@core/security/security.service';
 import { CategoryStore } from '../category/store/category-store';
 import { DocumentStatusStore } from '../document-status/store/document-status.store';
 import { DocumentMetaData } from '@core/domain-classes/documentMetaData';
+import { HttpClient } from '@angular/common/http';
+import { UserStore } from '../user/store/user-store';
+import { CommonError } from '@core/error-handler/common-error';
 
 @Component({
   selector: 'app-bulk-document-upload',
@@ -64,8 +67,9 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
   resultArray: any = [];
   minDate: Date;
   isS3Supported = false;
+  userDepartment: string;
 
-  @ViewChild('file') fileInput: any;
+  @ViewChild('file', { static: true }) fileInput!: ElementRef;
   @Output() onSaveDocument: EventEmitter<DocumentInfo> =
     new EventEmitter<DocumentInfo>();
   categoryStore = inject(CategoryStore);
@@ -76,29 +80,47 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
   private translationService = inject(TranslationService);
   private documentService = inject(DocumentService);
   documentStatusStore = inject(DocumentStatusStore);
+  private httpClient = inject(HttpClient);
+  public userStore = inject(UserStore);
   counter: number;
   direction: Direction;
   document: DocumentInfo;
 
-  constructor(private securityService: SecurityService,) {
+  constructor(
+    private securityService: SecurityService,
+  ) {
     super();
     this.minDate = new Date();
   }
 
   ngOnInit(): void {
+    this.loadUserDepartment();
     this.createDocumentForm();
-    this.documentMetaTagsArray.push(this.buildDocumentMetaTag());
     this.getUsers();
     this.getRoles();
-    this.getAllAllowFileExtension();
+    this.getAllowedFileExtensions();
+    this.companyProfileSubscription();
+    this.userStore.loadUserPositions();
+  }
+
+  loadUserDepartment() {
+    this.sub$.sink = this.httpClient.get<{dept: string, pst: string}>('api/user-position').subscribe({
+      next: (response) => {
+        this.userDepartment = response.dept;
+        this.cd.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching user department:', error);
+      }
+    });
   }
 
   get fileInputs(): FormArray {
     return (<FormArray>this.documentForm.get('files')) as FormArray;
   }
 
-  get rolePermissionFormGroup() {
-    return this.documentForm.get('rolePermissionForm') as FormGroup;
+  get toUserPermissionFormGroup() {
+    return this.documentForm.get('toUserPermissionForm') as FormGroup;
   }
 
   get userPermissionFormGroup() {
@@ -113,17 +135,18 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
     this.documentForm = this.fb.group({
       name: [''],
       description: [''],
-      categoryId: ['', [Validators.required]],
+      categoryId: [''],
       url: [''],
       extension: [''],
       documentMetaTags: this.fb.array([]),
       location: [''],
       clientId: [''],
       statusId: [''],
-      selectedRoles: [],
+      selectedToUsers: [],
       selectedUsers: [],
       files: this.fb.array([]),
-      rolePermissionForm: this.fb.group({
+      sendMode: ['auto_assign'],
+      toUserPermissionForm: this.fb.group({
         isTimeBound: new UntypedFormControl(false),
         startDate: [''],
         endDate: [''],
@@ -201,7 +224,7 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
       .subscribe((roles: Role[]) => (this.roles = roles));
   }
 
-  getAllAllowFileExtension() {
+  getAllowedFileExtensions() {
     this.commonService.allowFileExtension$.subscribe(
       (allowFileExtension: AllowFileExtension[]) => {
         if (allowFileExtension) {
@@ -258,70 +281,109 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
   }
 
   saveFilesAndDocument() {
-    if (this.documentForm.valid) {
-      this.loading = true;
-      this.counter = 0;
-      const concatObservable$ = [];
-      this.fileInputs.controls.map(
-        (control) => {
-          if (!control.get('isSuccess').value) {
-            const documentObj = this.buildDocumentObject();
-            documentObj.url = control.get('fileName').value;
-            documentObj.name = control.get('name').value;
-            documentObj.extension = control.get('extension').value;
-            documentObj.fileData = control.get('file').value;
-            concatObservable$.push(this.documentService.addDocument({ ...documentObj }));
-          }
-        });
-      if (concatObservable$.length === 0) {
-        return;
-      }
-      this.resultArray = [];
-      from(concatObservable$)
-        .pipe(
-          concatMap((obs, index) => {
-            this.fileInputs.at(index).patchValue({
-              isLoading: true
+    if (this.userDepartment) {
+      const categoryId = this.findDepartmentCategoryId(this.userDepartment);
+      this.documentForm.patchValue({ categoryId: categoryId });
+    }
+
+    if (this.fileInputs.length === 0) {
+      this.documentForm.get('files').markAsTouched();
+      return;
+    }
+
+    this.loading = true;
+    this.counter = 0;
+    const concatObservable$ = [];
+    
+    this.fileInputs.controls.forEach((control) => {
+      if (!control.get('isSuccess').value) {
+        const documentObj = this.buildDocumentObject();
+        documentObj.url = control.get('fileName').value;
+        documentObj.name = control.get('name').value;
+        documentObj.extension = control.get('extension').value;
+        documentObj.fileData = control.get('file').value;
+
+        // If auto_assign mode is selected, we'll let the backend handle the routing
+        if (this.documentForm.get('sendMode').value === 'auto_assign') {
+          documentObj.isAutoAssign = true;
+          // Clear any manually selected users since we're using AI routing
+          documentObj.selectedToUsers = [];
+          documentObj.selectedUsers = [];
+        }
+
+        const formData = new FormData();
+        formData.append('uploadFile', control.get('file').value);
+        formData.append('name', documentObj.name);
+        formData.append('description', documentObj.description || '');
+        formData.append('categoryId', documentObj.categoryId);
+        formData.append('location', documentObj.location);
+        formData.append('clientId', documentObj.clientId || '');
+        formData.append('statusId', documentObj.statusId || '');
+        formData.append('auto_assign', documentObj.isAutoAssign ? 'true' : 'false');
+
+        if (!documentObj.isAutoAssign && documentObj.documentUserPermissions?.length > 0) {
+          formData.append('documentUserPermissions', JSON.stringify(documentObj.documentUserPermissions));
+        }
+
+        if (documentObj.documentMetaDatas?.length > 0) {
+          formData.append('documentMetaDatas', JSON.stringify(documentObj.documentMetaDatas));
+        }
+
+        concatObservable$.push(
+          this.documentService.saveDocument(formData).pipe(
+            map((response: DocumentInfo | CommonError) => {
+              if ('id' in response) { // This is a DocumentInfo
+                control.patchValue({
+                  isSuccess: true,
+                  message: this.translationService.getValue('DOCUMENT_SAVE_SUCCESSFULLY')
+                });
+                return response as DocumentInfo;
+              } else { // This is a CommonError
+                const errorResponse = response as CommonError;
+                control.patchValue({
+                  isSuccess: false,
+                  message: errorResponse.friendlyMessage || errorResponse.messages?.[0] || 'Error saving document'
+                });
+                throw new Error(errorResponse.friendlyMessage || errorResponse.messages?.[0] || 'Error saving document');
+              }
+            }),
+            catchError(error => {
+              control.patchValue({
+                isSuccess: false,
+                message: error.message || 'Error saving document'
+              });
+              return of(null);
             })
-            return obs.pipe(
-              catchError(err => {
-                return of(`${typeof (err.messages[0]) == 'string' ? err.messages[0] : err.friendlyMessage}`);
-              })
-            )
-          })
+          )
+        );
+      }
+    });
+
+    if (concatObservable$.length > 0) {
+      this.sub$.sink = from(concatObservable$)
+        .pipe(
+          concatMap(observable => observable)
         )
         .subscribe({
-          next: (document: DocumentInfo | string) => {
+          next: (response) => {
             this.counter++;
-            this.fileInputs.at(this.counter - 1).patchValue({
-              isLoading: false
-            });
-            if (typeof document === 'string') {
-              this.resultArray.push({
-                isSuccess: false,
-                message: document,
-                name: this.fileInputs.at(this.counter - 1).get('name').value
-              })
-            } else {
-              this.addDocumentTrail(document.id);
-              this.resultArray.push({
-                isSuccess: true,
-                name: this.fileInputs.at(this.counter - 1).get('name').value,
-                message: this.translationService.getValue('DOCUMENT_SAVE_SUCCESSFULLY')
-              });
-            }
-            if (this.counter === this.fileInputs.length) {
-              while (this.fileInputs.controls.length) {
-                this.fileInputs.removeAt(0);
-              }
+            if (this.counter === this.fileInputs.controls.length) {
               this.loading = false;
-              this.fileInput.nativeElement.value = '';
+              this.fileInputs.clear();
+              if (this.fileInput?.nativeElement) {
+                this.fileInput.nativeElement.value = '';
+              }
+              this.cd.detectChanges();
             }
+          },
+          error: (error) => {
+            this.loading = false;
+            this.cd.detectChanges();
           }
         });
     } else {
-      this.markFormGroupTouched(this.documentForm);
-      return;
+      this.loading = false;
+      this.cd.detectChanges();
     }
   }
 
@@ -338,33 +400,19 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
   }
 
   buildDocumentObject(): DocumentInfo {
-    const files = this.fileInputs.getRawValue();
     const documentMetaTags = this.documentMetaTagsArray.getRawValue();
     const document: DocumentInfo = {
-      categoryId: this.documentForm.get('categoryId').value ?? '',
-      location: this.documentForm.get('location').value,
-      clientId: this.documentForm.get('clientId').value ?? '',
-      statusId: this.documentForm.get('statusId').value ?? '',
-      description: this.documentForm.get('description').value ?? '',
+      categoryId: this.findDepartmentCategoryId(this.userDepartment),
+      description: this.documentForm.get('description')?.value ?? '',
       documentMetaDatas: [...documentMetaTags],
+      location: this.documentForm.get('location')?.value ?? '',
+      clientId: this.documentForm.get('clientId')?.value ?? '',
+      statusId: this.documentForm.get('statusId')?.value ?? '',
     };
-    const selectedRoles: Role[] = this.documentForm.get('selectedRoles').value ?? [];
-    if (selectedRoles?.length > 0) {
-      document.documentRolePermissions = selectedRoles.map((role) => {
-        return Object.assign(
-          {},
-          {
-            id: '',
-            documentId: '',
-            roleId: role.id,
-          },
-          this.rolePermissionFormGroup.value
-        );
-      });
-    }
-    const selectedUsers: User[] = this.documentForm.get('selectedUsers').value ?? [];
-    if (selectedUsers?.length > 0) {
-      document.documentUserPermissions = selectedUsers.map((user) => {
+
+    const selectedToUsers: User[] = this.documentForm.get('selectedToUsers')?.value ?? [];
+    if (selectedToUsers?.length > 0) {
+      document.documentUserPermissions = selectedToUsers.map((user) => {
         return Object.assign(
           {},
           {
@@ -372,26 +420,51 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
             documentId: '',
             userId: user.id,
           },
-          this.userPermissionFormGroup.value
+          this.toUserPermissionFormGroup.value
         );
       });
+    }
+
+    const selectedUsers: User[] = this.documentForm.get('selectedUsers')?.value ?? [];
+    if (selectedUsers?.length > 0) {
+      document.documentUserPermissions = [
+        ...(document.documentUserPermissions || []),
+        ...selectedUsers.map((user) => {
+          return Object.assign(
+            {},
+            {
+              id: '',
+              documentId: '',
+              userId: user.id,
+            },
+            this.userPermissionFormGroup.value
+          );
+        })
+      ];
     }
     return document;
   }
 
-  roleTimeBoundChange(event: MatCheckboxChange) {
+  findDepartmentCategoryId(departmentName: string): string {
+    const matchingCategory = this.categoryStore.categories()?.find(cat => 
+      cat.name.toLowerCase() === departmentName?.toLowerCase()
+    );
+    return matchingCategory?.id ?? '';
+  }
+
+  toUserTimeBoundChange(event: MatCheckboxChange) {
     if (event.checked) {
-      this.rolePermissionFormGroup
+      this.toUserPermissionFormGroup
         .get('startDate')
         .setValidators([Validators.required]);
-      this.rolePermissionFormGroup
+      this.toUserPermissionFormGroup
         .get('endDate')
         .setValidators([Validators.required]);
     } else {
-      this.rolePermissionFormGroup.get('startDate').clearValidators();
-      this.rolePermissionFormGroup.get('startDate').updateValueAndValidity();
-      this.rolePermissionFormGroup.get('endDate').clearValidators();
-      this.rolePermissionFormGroup.get('endDate').updateValueAndValidity();
+      this.toUserPermissionFormGroup.get('startDate').clearValidators();
+      this.toUserPermissionFormGroup.get('startDate').updateValueAndValidity();
+      this.toUserPermissionFormGroup.get('endDate').clearValidators();
+      this.toUserPermissionFormGroup.get('endDate').updateValueAndValidity();
     }
   }
 
@@ -411,4 +484,46 @@ export class BulkDocumentUploadComponent extends BaseComponent implements OnInit
     }
   }
 
+  autoSendDocuments() {
+    if (this.fileInputs.length === 0) {
+      this.documentForm.get('files').markAsTouched();
+      return;
+    }
+
+    this.loading = true;
+    
+    // Create FormData to send to the endpoint
+    const formData = new FormData();
+    
+    // Add the department ID
+    if (this.userDepartment) {
+      const categoryId = this.findDepartmentCategoryId(this.userDepartment);
+      formData.append('categoryId', categoryId);
+    }
+
+    // Add all files
+    this.fileInputs.controls.forEach((control, index) => {
+      const file = control.get('file').value;
+      formData.append(`files[${index}]`, file);
+      formData.append(`names[${index}]`, control.get('name').value);
+    });
+
+    // TODO: Replace with your endpoint call
+    console.log('Ready to send to AI endpoint:', formData);
+    
+    // For now, just clear the form and show a message
+    this.resultArray.push({
+      isSuccess: true,
+      name: 'AI Processing',
+      message: 'Documents ready for AI processing (endpoint to be implemented)'
+    });
+    
+    this.loading = false;
+    if (this.fileInput?.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
+    while (this.fileInputs.controls.length) {
+      this.fileInputs.removeAt(0);
+    }
+  }
 }

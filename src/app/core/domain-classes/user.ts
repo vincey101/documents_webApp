@@ -7,6 +7,8 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
+  categoryId?: string;
+  positionId?: string;
   password?: string;
   phoneNumber?: string;
   userRoles?: UserRoles[];

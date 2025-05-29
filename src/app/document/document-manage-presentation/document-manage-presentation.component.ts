@@ -35,6 +35,14 @@ import { TranslationService } from '@core/services/translation.service';
 import { BaseComponent } from 'src/app/base.component';
 import { ClientStore } from 'src/app/client/client-store';
 import { OpenAIService } from '@core/services/openai.service';
+import { UserStore } from 'src/app/user/store/user-store';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { DocumentOperation } from '@core/domain-classes/document-operation';
+import { DocumentAuditTrail } from '@core/domain-classes/document-audit-trail';
+import { DocumentService } from '../document.service';
+import { catchError, concatMap, from, of } from 'rxjs';
+import { Router } from '@angular/router';
 
 // Declare Quill as global variable
 declare var Quill: any;
@@ -54,6 +62,7 @@ export class DocumentManagePresentationComponent
   categories: Category[] = [];
   allCategories: Category[] = [];
   documentSource: string;
+  userDepartment: string = '';
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   @Output() onSaveDocument: EventEmitter<DocumentInfo> =
     new EventEmitter<DocumentInfo>();
@@ -62,16 +71,25 @@ export class DocumentManagePresentationComponent
   fileInfo: FileInfo;
   isFileUpload = false;
   fileData: any;
-  users: User[];
   roles: Role[];
   allowFileExtension: AllowFileExtension[] = [];
   minDate: Date;
   isS3Supported = false;
   direction: Direction;
   clientStore = inject(ClientStore);
+  userStore = inject(UserStore);
+  resultArray: any = [];
+  loading: boolean = false;
+  counter: number = 0;
+
   get documentMetaTagsArray(): FormArray {
     return <FormArray>this.documentForm.get('documentMetaTags');
   }
+  
+  get fileInputs(): FormArray {
+    return (<FormArray>this.documentForm.get('files')) as FormArray;
+  }
+
   public showAiPrompt = false;
   public aiPrompt = '';
   public isGenerating = false;
@@ -89,7 +107,9 @@ export class DocumentManagePresentationComponent
     private commonService: CommonService,
     private securityService: SecurityService,
     private translationService: TranslationService,
-    private openAIService: OpenAIService
+    private openAIService: OpenAIService,
+    private documentService: DocumentService,
+    private router: Router
   ) {
     super();
     this.minDate = new Date();
@@ -99,7 +119,7 @@ export class DocumentManagePresentationComponent
     this.createDocumentForm();
     this.getCategories();
     this.documentMetaTagsArray.push(this.buildDocumentMetaTag());
-    this.getUsers();
+    this.loadUserData();
     this.getRoles();
     this.getCompanyProfile();
     this.getLangDir();
@@ -125,12 +145,6 @@ export class DocumentManagePresentationComponent
         this.isS3Supported = profile.location == 's3';
       }
     });
-  }
-
-  getUsers() {
-    this.sub$.sink = this.commonService
-      .getUsersForDropdown()
-      .subscribe((users: User[]) => (this.users = users));
   }
 
   getRoles() {
@@ -210,14 +224,13 @@ export class DocumentManagePresentationComponent
     return allowTypeExtenstion ? true : false;
   }
 
-
   createDocumentForm() {
     this.documentForm = this.fb.group({
       name: ['', [Validators.required]],
       description: [''],
-      categoryId: ['', [Validators.required]],
-      url: ['', [Validators.required]],
-      extension: ['', [Validators.required]],
+      categoryId: [''],
+      url: [''],
+      extension: [''],
       documentMetaTags: this.fb.array([]),
       selectedRoles: [],
       selectedToUsers: [],
@@ -245,6 +258,7 @@ export class DocumentManagePresentationComponent
       templateType: ['template1', Validators.required],
       subject: ['', Validators.required],
       content: ['', Validators.required],
+      files: this.fb.array([]),
     });
     this.companyProfileSubscription();
 
@@ -308,26 +322,190 @@ export class DocumentManagePresentationComponent
   }
 
   SaveDocument() {
-    if (this.documentForm.valid) {
-      this.onSaveDocument.emit(this.buildDocumentObject());
-    } else {
+    if (this.documentForm.get('subject').invalid || this.documentForm.get('content').invalid) {
       this.documentForm.markAllAsTouched();
+      return;
     }
+
+    this.loading = true;
+    this.counter = 0;
+    this.resultArray = [];
+
+    // Create array of file tasks
+    const fileUploadTasks = [];
+    
+    // Add the PDF document export
+    const pdfTask = this.exportToPDF(true)
+      .then(pdfBlob => {
+        const pdfFile = new File([pdfBlob], 
+          `${this.documentForm.get('subject').value.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`, 
+          { type: 'application/pdf' }
+        );
+        return pdfFile;
+      })
+      .catch(error => {
+        console.error('Error creating PDF', error);
+        return null;
+      });
+
+    Promise.all([pdfTask])
+      .then(files => {
+        // Filter out any null results
+        const validFiles = files.filter(file => file !== null);
+        
+        // If we have a valid PDF file
+        if (validFiles.length > 0) {
+          // Add PDF file to the document objects
+          validFiles.forEach(file => {
+            this.fileInputs.push(
+              this.fb.group({
+                fileName: [file.name],
+                file: [file],
+                name: [file.name, Validators.required],
+                extension: ['pdf'],
+                message: [''],
+                isSuccess: [false],
+                isLoading: [false],
+              })
+            );
+          });
+        }
+        
+        // If there's also an uploaded document, add it
+        if (this.fileData) {
+          this.fileInputs.push(
+            this.fb.group({
+              fileName: [this.fileData.name],
+              file: [this.fileData],
+              name: [this.fileData.name, Validators.required],
+              extension: [this.extension],
+              message: [''],
+              isSuccess: [false],
+              isLoading: [false],
+            })
+          );
+        }
+        
+        // If we have files to process, save them
+        if (this.fileInputs.length > 0) {
+          this.processSaveDocuments();
+        } else {
+          this.loading = false;
+          this.resultArray.push({
+            isSuccess: false,
+            name: 'No files to process',
+            message: 'No valid files were generated or uploaded'
+          });
+        }
+      });
+  }
+
+  processSaveDocuments() {
+    const concatObservable$ = [];
+    this.fileInputs.controls.forEach((control) => {
+      const documentObj = this.buildDocumentObject();
+      documentObj.url = control.get('fileName').value;
+      documentObj.name = control.get('name').value;
+      documentObj.extension = control.get('extension').value;
+      documentObj.fileData = control.get('file').value;
+      
+      // Set categoryId to user department
+      documentObj.categoryId = this.findDepartmentCategoryId(this.userDepartment);
+      
+      concatObservable$.push(this.documentService.addDocument({ ...documentObj }));
+    });
+
+    from(concatObservable$)
+      .pipe(
+        concatMap((obs, index) => {
+          this.fileInputs.at(index).patchValue({
+            isLoading: true
+          });
+          return obs.pipe(
+            catchError(err => {
+              return of(`${typeof (err.messages?.[0]) === 'string' ? err.messages[0] : (err.friendlyMessage || 'Error saving document')}`);
+            })
+          );
+        })
+      )
+      .subscribe({
+        next: (document: DocumentInfo | string) => {
+          this.counter++;
+          this.fileInputs.at(this.counter - 1).patchValue({
+            isLoading: false
+          });
+          if (typeof document === 'string') {
+            this.resultArray.push({
+              isSuccess: false,
+              message: document,
+              name: this.fileInputs.at(this.counter - 1).get('name').value
+            });
+          } else {
+            this.addDocumentTrail(document.id);
+            this.resultArray.push({
+              isSuccess: true,
+              name: this.fileInputs.at(this.counter - 1).get('name').value,
+              message: this.translationService.getValue('DOCUMENT_SAVE_SUCCESSFULLY')
+            });
+          }
+          
+          if (this.counter === this.fileInputs.length) {
+            this.loading = false;
+            this.cd.markForCheck();
+            
+            // Navigate to documents page after saving is complete
+            this.router.navigate(['/documents']);
+          }
+        },
+        complete: () => {
+          this.loading = false;
+          this.cd.markForCheck();
+          
+          // Ensure navigation happens on completion as well
+          if (this.fileInputs.length > 0) {
+            this.router.navigate(['/documents']);
+          }
+        }
+      });
+  }
+
+  findDepartmentCategoryId(departmentName: string): string {
+    // Find matching category by name
+    const matchingCategory = this.allCategories.find(cat => 
+      cat.name.toLowerCase() === departmentName.toLowerCase()
+    );
+    return matchingCategory ? matchingCategory.id : '';
+  }
+
+  addDocumentTrail(id: string) {
+    const objDocumentAuditTrail: DocumentAuditTrail = {
+      documentId: id,
+      operationName: DocumentOperation.Created.toString(),
+    };
+    this.sub$.sink = this.commonService
+      .addDocumentAuditTrail(objDocumentAuditTrail)
+      .subscribe(() => {});
+  }
+
+  removeFile(index: number): void {
+    this.fileInputs.removeAt(index);
   }
 
   buildDocumentObject(): DocumentInfo {
     const documentMetaTags = this.documentMetaTagsArray.getRawValue();
     const document: DocumentInfo = {
-      categoryId: this.documentForm.get('categoryId').value,
+      categoryId: this.documentForm.get('categoryId').value || this.findDepartmentCategoryId(this.userDepartment),
       description: this.documentForm.get('description').value,
       name: this.documentForm.get('name').value,
-      url: this.fileData.fileName,
       documentMetaDatas: [...documentMetaTags],
-      fileData: this.fileData,
-      extension: this.extension,
       location: this.documentForm.get('location').value,
       clientId: this.documentForm.get('clientId').value ?? '',
+      templateType: this.documentForm.get('templateType').value,
+      subject: this.documentForm.get('subject').value,
+      content: this.documentForm.get('content').value,
+      toUserEndDate: this.toUserPermissionFormGroup.get('endDate').value
     };
+    
     const selectedRoles: Role[] =
       this.documentForm.get('selectedRoles').value ?? [];
     if (selectedRoles?.length > 0) {
@@ -344,9 +522,33 @@ export class DocumentManagePresentationComponent
       });
     }
 
+    // Initialize document user permissions array
+    document.documentUserPermissions = [];
+
+    // Get Through users
+    const selectedThroughUsers: User[] =
+      this.documentForm.get('selectedThroughUsers').value ?? [];
+
+    // Get To users
     const selectedToUsers: User[] =
       this.documentForm.get('selectedToUsers').value ?? [];
-    if (selectedToUsers?.length > 0) {
+
+    // If Through users exist, only add them to permissions
+    if (selectedThroughUsers?.length > 0) {
+      document.documentUserPermissions = selectedThroughUsers.map((user) => {
+        return Object.assign(
+          {},
+          {
+            id: '',
+            documentId: '',
+            userId: user.id,
+          },
+          this.throughUserPermissionFormGroup.value
+        );
+      });
+    } 
+    // Only if no Through users are selected, add To users
+    else if (selectedToUsers?.length > 0) {
       document.documentUserPermissions = selectedToUsers.map((user) => {
         return Object.assign(
           {},
@@ -360,21 +562,6 @@ export class DocumentManagePresentationComponent
       });
     }
 
-    const selectedThroughUsers: User[] =
-      this.documentForm.get('selectedThroughUsers').value ?? [];
-    if (selectedThroughUsers?.length > 0) {
-      document.documentUserPermissions = selectedThroughUsers.map((user) => {
-        return Object.assign(
-          {},
-          {
-            id: '',
-            documentId: '',
-            userId: user.id,
-          },
-          this.throughUserPermissionFormGroup.value
-        );
-      });
-    }
     return document;
   }
 
@@ -395,8 +582,11 @@ export class DocumentManagePresentationComponent
   }
 
   upload(files) {
-    if (files.length === 0) return;
-    this.extension = files[0].name.split('.').pop();
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    this.extension = file.name.split('.').pop();
+    
     if (!this.fileExtesionValidation(this.extension)) {
       this.fileUploadExtensionValidation('');
       this.cd.markForCheck();
@@ -405,9 +595,11 @@ export class DocumentManagePresentationComponent
       this.fileUploadExtensionValidation('valid');
     }
 
-    this.fileData = files[0];
-    this.documentForm.get('url').setValue(files[0].name);
-    this.documentForm.get('name').setValue(files[0].name);
+    this.fileData = file;
+    this.documentForm.get('url').setValue(file.name);
+    if (!this.documentForm.get('name').value) {
+      this.documentForm.get('name').setValue(file.name);
+    }
   }
 
   roleTimeBoundChange(event: MatCheckboxChange) {
@@ -466,10 +658,10 @@ export class DocumentManagePresentationComponent
   }
   
   getSelectedToUsersString(): string {
-    // Get selected To users
+    // Get selected To users with the new format - show only firstname lastname
     const selectedToUsers = this.documentForm?.get('selectedToUsers')?.value || [];
     const toUsersString = selectedToUsers.length > 0 ? 
-      selectedToUsers.map(user => `${user.firstName} ${user.lastName}`).join(', ') : '';
+      selectedToUsers.map(user => `${user.firstName || user.firstname} ${user.lastName || user.lastname}`).join(', ') : '';
     
     // Get selected roles
     const selectedRoles = this.documentForm?.get('selectedRoles')?.value || [];
@@ -480,22 +672,32 @@ export class DocumentManagePresentationComponent
     if (toUsersString && rolesString) {
       return `${toUsersString}, ${rolesString}`;
     } else {
-      return toUsersString || rolesString;
+      return toUsersString || rolesString || '';
     }
   }
   
+  getSelectedThroughUsers(): User[] {
+    return this.documentForm?.get('selectedThroughUsers')?.value || [];
+  }
+  
   getSelectedThroughUsersString(): string {
+    // For Through users - show only positionName
     const selectedThroughUsers = this.documentForm?.get('selectedThroughUsers')?.value;
     if (!selectedThroughUsers || selectedThroughUsers.length === 0) {
       return '';
     }
-    return selectedThroughUsers.map(user => `${user.firstName} ${user.lastName}`).join(', ');
+    return selectedThroughUsers.map(user => {
+      // Type assertion to access dynamic properties
+      const userObj = user as any;
+      return userObj.positionName || userObj.position || userObj.displayName || 
+             `${userObj.firstName || userObj.firstname} ${userObj.lastName || userObj.lastname}`;
+    }).join(', ');
   }
 
   getCurrentUser(): string {
     const authObj = JSON.parse(localStorage.getItem('authObj'));
     if (authObj && authObj.user) {
-      return `${authObj.user.firstName} ${authObj.user.lastName}`;
+      return `${authObj.user.firstName || ''} ${authObj.user.lastName || ''}`;
     }
     return '';
   }
@@ -505,16 +707,16 @@ export class DocumentManagePresentationComponent
   }
 
   onEditorChange(event: any): void {
-    // Force change detection to update preview immediately
-    this.cd.detectChanges();
+    this.documentForm.get('content').setValue(event);
+    this.cd.markForCheck();
   }
 
   openAiModal(): void {
-    this.aiPrompt = '';
-    this.isGenerating = false;
     this.showModal = true;
+    this.aiPrompt = '';
+    this.errorMessage = '';
     
-    // Focus on the textarea once the modal is shown
+    // Focus the textarea after a brief delay to ensure modal is rendered
     setTimeout(() => {
       const promptTextarea = document.getElementById('aiPromptInput') as HTMLTextAreaElement;
       if (promptTextarea) {
@@ -607,5 +809,169 @@ export class DocumentManagePresentationComponent
         this.cd.detectChanges();
       });
     }
+  }
+
+  exportToPDF(returnBlob: boolean = false): Promise<Blob | null> {
+    return new Promise((resolve, reject) => {
+    const previewElement = document.querySelector('.preview-box');
+    if (!previewElement) {
+      console.error('Preview element not found');
+        resolve(null);
+      return;
+    }
+
+      // Force black color on ALL elements before capture 
+      const applyBlackTextRecursively = (element: Element) => {
+        if (element instanceof HTMLElement) {
+          element.style.setProperty('color', '#000000', 'important');
+          element.style.setProperty('font-weight', 'normal', 'important');
+          element.style.setProperty('font-size', '10px', 'important');
+        }
+        
+        // Process all child elements
+        if (element.children) {
+          Array.from(element.children).forEach(child => {
+            applyBlackTextRecursively(child);
+          });
+        }
+      };
+      
+      // Apply black text color to the entire preview box and all its children
+      applyBlackTextRecursively(previewElement);
+      
+      // Additional specific targeting for headers and titles
+      const headers = previewElement.querySelectorAll('h1, h2, h3, h4, h5, h6, .letterhead-header, .memorandum-header, .official-letterhead h4');
+      headers.forEach(header => {
+        const headerElement = header as HTMLElement;
+        headerElement.style.setProperty('color', '#000000', 'important');
+        // Keep headings bold if needed, but ensure they're black
+      });
+
+      // Ensure the memo-details section has grey background for template 1
+      if (this.documentForm.get('templateType').value === 'template1') {
+        const memoDetails = previewElement.querySelector('.memo-details');
+        if (memoDetails && memoDetails instanceof HTMLElement) {
+          memoDetails.style.setProperty('background-color', '#f5f5f5', 'important');
+        }
+    }
+
+    html2canvas(previewElement as HTMLElement, {
+      scale: 4,
+      useCORS: true,
+      logging: false,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      onclone: (clonedDoc) => {
+          // Create a global style to force black text everywhere
+          const globalStyle = clonedDoc.createElement('style');
+          globalStyle.textContent = `
+            * {
+              color: #000000 !important;
+            }
+            h1, h2, h3, h4, h5, h6 {
+              color: #000000 !important;
+            }
+            .letterhead-header, .memorandum-header, .official-letterhead h4, 
+            .preview-box p, .preview-box div, .preview-box span {
+              color: #000000 !important;
+            }
+            .memo-details {
+              background-color: #f5f5f5 !important;
+            }
+          `;
+          clonedDoc.head.appendChild(globalStyle);
+          
+          // Apply black color to all elements in the cloned document
+          const clonedPreview = clonedDoc.querySelector('.preview-box');
+          if (clonedPreview) {
+            // Process all elements recursively
+            function forceBlackColorRecursively(element: Element): void {
+              if (element instanceof HTMLElement) {
+                element.style.setProperty('color', '#000000', 'important');
+                element.style.setProperty('font-weight', 'normal', 'important');
+                element.style.setProperty('font-size', '10px', 'important');
+              }
+              
+              if (element.children) {
+                Array.from(element.children).forEach(child => {
+                  forceBlackColorRecursively(child);
+                });
+              }
+            }
+            
+            forceBlackColorRecursively(clonedPreview);
+            
+            // Additional specific targeting for headers and titles in the cloned document
+            const clonedHeaders = clonedPreview.querySelectorAll('h1, h2, h3, h4, h5, h6, .letterhead-header, .memorandum-header, .official-letterhead h4');
+            clonedHeaders.forEach(header => {
+              const headerElement = header as HTMLElement;
+              headerElement.style.setProperty('color', '#000000', 'important');
+            });
+            
+            // Ensure the memo-details section has grey background in the cloned document
+            if (this.documentForm.get('templateType').value === 'template1') {
+              const clonedMemoDetails = clonedPreview.querySelector('.memo-details');
+              if (clonedMemoDetails && clonedMemoDetails instanceof HTMLElement) {
+                clonedMemoDetails.style.setProperty('background-color', '#f5f5f5', 'important');
+              }
+            }
+          }
+        }
+      }).then(canvas => {
+        // Set canvas context to use black fill
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#000000';
+        }
+        
+      const imgWidth = 210;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      const contentDataURL = canvas.toDataURL('image/png', 1.0);
+      
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: false
+      });
+      
+      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight, '', 'FAST');
+      
+        if (returnBlob) {
+          // Return PDF as a Blob for saving as a document
+          const blob = pdf.output('blob');
+          resolve(blob);
+        } else {
+          // Save PDF directly
+      const pdfName = this.documentForm.get('templateType').value === 'template1' 
+        ? 'NIPSS_Memorandum.pdf' 
+        : 'NIPSS_Letter.pdf';
+      pdf.save(pdfName);
+          resolve(null);
+        }
+      }).catch(error => {
+        console.error('Error in HTML2Canvas', error);
+        reject(error);
+      });
+    });
+  }
+
+  loadUserData() {
+    // Load user data from UserStore for the dropdowns
+    this.userStore.loadUsers();
+    this.userStore.loadUserPositions();
+    
+    // Make a separate call to get the user's department and position as simple strings
+    this.sub$.sink = this.httpClient.get<{dept: string, pst: string}>('api/user-position').subscribe({
+      next: (response) => {
+        console.log('User department/position from api/user-position:', response);
+        // Set department as a simple string
+        this.userDepartment = response.dept;
+        this.cd.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching user department:', error);
+      }
+    });
   }
 }

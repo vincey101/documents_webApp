@@ -1,14 +1,46 @@
 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-  <div class="card">
+  <div class="card main-card">
     <div class="header">
-      <span class="page-title">{{ "DOCUMENTS_BY_CATEGORY" | translate }}
-        <app-page-help-text code="DOCUMENTS_BY_CATEGORY"></app-page-help-text>
+      <span class="page-title">{{ "Document Statistics" | translate }}
+        <app-page-help-text code="DOCUMENT_STATISTICS"></app-page-help-text>
       </span>
     </div>
     <div class="body">
-      <ngx-charts-pie-chart [results]="single" legendTitle="{{'DOCUMENT_CATEGORIES' | translate}}" [legend]="true"
-        [labels]="true">
-      </ngx-charts-pie-chart>
+      <!-- Loading indicator -->
+      <div *ngIf="loading" class="text-center p-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      
+      <!-- Document cards - 3 per row -->
+      <div class="row g-3" *ngIf="!loading">
+        <!-- All document cards in one loop -->
+        <div class="col-md-4 mb-3" *ngFor="let card of documentCards">
+          <a [routerLink]="[card.route]" class="text-decoration-none">
+            <div class="modern-card compact">
+              <div class="card-content">
+                <div class="card-header">
+                  <div class="icon-wrapper" [ngStyle]="{'background-color': card.color}">
+                    <i class="material-icons">{{ card.icon }}</i>
+                  </div>
+                  <div class="count-badge">
+                    <span>{{ card.count }}</span>
+                  </div>
+                </div>
+                <div class="department-details">
+                  <h3 class="department-name">{{ card.name }}</h3>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      
+      <!-- No data message -->
+      <div *ngIf="!loading && documentCards.length === 0" class="text-center p-5">
+        <p class="text-muted">No document data available</p>
+      </div>
     </div>
   </div>
 </div>
